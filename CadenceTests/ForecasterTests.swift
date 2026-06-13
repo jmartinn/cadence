@@ -137,4 +137,21 @@ struct ForecasterTests {
         #expect(result.paid == 1)
         #expect(result.total == 1)
     }
+
+    @Test func projectedBalanceCanGoNegative() {
+        // No overdraft guard: charges beyond the balance produce a negative projection.
+        let sub = plan(amount: "30.00", cycle: .monthly, anchor: day(2025, 1, 10))
+        let f = forecaster(balance: "50.00", asOf: day(2025, 1, 1), [sub])
+        // Window (Jan 1, Mar 15]: Jan 10, Feb 10, Mar 10 → 3 charges → 50 - 90.
+        #expect(f.projectedBalance(on: day(2025, 3, 15)) == dec("-40.00"))
+    }
+
+    @Test func paidThisMonthCountsAChargeDatedToday() {
+        // Boundary: a charge falling exactly on `today` counts as already paid (charge <= today).
+        let sub = plan(amount: "10.00", cycle: .monthly, anchor: day(2025, 1, 15))
+        let f = forecaster(balance: "0.00", asOf: day(2025, 1, 1), [sub])
+        let result = f.paidThisMonth(asOf: day(2025, 1, 15))
+        #expect(result.paid == 1)
+        #expect(result.total == 1)
+    }
 }

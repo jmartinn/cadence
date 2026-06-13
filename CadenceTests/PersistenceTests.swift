@@ -46,6 +46,8 @@ struct PersistenceTests {
             status: .active,
             category: "Utilities"
         ))
+        try context.save()
+
         let got = try #require(try context.fetch(FetchDescriptor<Subscription>()).first)
         #expect(got.serviceKey == nil)
         #expect(got.billingCycle == .yearly)

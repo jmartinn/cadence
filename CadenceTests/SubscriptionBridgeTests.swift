@@ -29,4 +29,21 @@ struct SubscriptionBridgeTests {
         #expect(plan.anchorDate == anchor)
         #expect(plan.status == .paused)
     }
+
+    /// Guards the cycle field specifically for `.yearly`, so a monthly-only mis-mapping
+    /// in `Subscription.plan` can't slip past a test that only ever exercised `.monthly`.
+    @Test func planMirrorsYearlyCycle() throws {
+        let context = ModelContext(container)
+        context.insert(Subscription(
+            name: "Amazon Prime",
+            amount: dec("49.00"),
+            billingCycle: .yearly,
+            anchorDate: Date(timeIntervalSince1970: 1_700_000_000),
+            status: .active,
+            category: "Shopping"
+        ))
+
+        let got = try #require(try context.fetch(FetchDescriptor<Subscription>()).first)
+        #expect(got.plan.cycle == .yearly)
+    }
 }

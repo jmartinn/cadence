@@ -13,8 +13,10 @@ extension ModelContext {
 
     /// Active subscriptions mapped to the pure value type `Forecaster` consumes.
     /// Mapping happens here, on this context's actor; the result is a `Sendable` snapshot.
+    /// Uses an unsorted fetch — the Forecaster sums plans, so display order is irrelevant
+    /// and sorting by name here would be wasted work.
     func activePlans() throws -> [SubscriptionPlan] {
-        try allSubscriptions()
+        try fetch(FetchDescriptor<Subscription>())
             .filter { $0.status == .active }
             .map(\.plan)
     }

@@ -32,29 +32,18 @@ struct Forecaster: Sendable {
         return balance
     }
 
-    /// Sum of active subscriptions normalized to a monthly amount (yearly ÷ 12).
-    /// Exact `Decimal`; the UI rounds for display.
+    /// Sum of active subscriptions normalized to a monthly amount. Exact `Decimal`; the UI rounds for display.
     var monthlyTotal: Decimal {
         subscriptions
             .filter { $0.status == .active }
-            .reduce(Decimal.zero) { sum, plan in
-                switch plan.cycle {
-                case .monthly: return sum + plan.amount
-                case .yearly:  return sum + plan.amount / 12
-                }
-            }
+            .reduce(into: .zero) { $0 += $1.normalizedMonthlyAmount }
     }
 
-    /// Sum of active subscriptions normalized to a yearly amount (monthly × 12).
+    /// Sum of active subscriptions normalized to a yearly amount. Exact `Decimal`; the UI rounds for display.
     var yearlyTotal: Decimal {
         subscriptions
             .filter { $0.status == .active }
-            .reduce(Decimal.zero) { sum, plan in
-                switch plan.cycle {
-                case .monthly: return sum + plan.amount * 12
-                case .yearly:  return sum + plan.amount
-                }
-            }
+            .reduce(into: .zero) { $0 += $1.normalizedYearlyAmount }
     }
 
     /// (paid, total) for the calendar month containing `today`.

@@ -21,23 +21,19 @@ struct BillingSchedule: Sendable {
     /// behave (Jan 31 → Feb 28 → Mar 31, not → Mar 28).
     func occurrences(in interval: DateInterval) -> [Date] {
         var result: [Date] = []
-        var n = 0
-        while n < Self.maxIterations {
+        for n in 0..<Self.maxIterations {
             guard let date = calendar.date(byAdding: cycle.components(times: n), to: anchorDate) else { break }
             if date > interval.end { break }
             if date >= interval.start { result.append(date) }
-            n += 1
         }
         return result
     }
 
     /// The first charge strictly after `date` (the anchor counts if it's after `date`).
     func nextOccurrence(after date: Date) -> Date? {
-        var n = 0
-        while n < Self.maxIterations {
+        for n in 0..<Self.maxIterations {
             guard let candidate = calendar.date(byAdding: cycle.components(times: n), to: anchorDate) else { return nil }
             if candidate > date { return candidate }
-            n += 1
         }
         return nil
     }

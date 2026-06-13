@@ -79,4 +79,12 @@ struct ForecasterTests {
         #expect(f.projectedBalance(on: day(2025, 1, 1)) == dec("100.00"))
         #expect(f.projectedBalance(on: day(2025, 6, 1)) == dec("100.00"))
     }
+
+    @Test func pausedAndEndedSubscriptionsAreIgnoredInProjection() {
+        let active = plan(amount: "10.00", cycle: .monthly, anchor: day(2025, 1, 10), status: .active)
+        let paused = plan(amount: "20.00", cycle: .monthly, anchor: day(2025, 1, 10), status: .paused)
+        let ended  = plan(amount: "30.00", cycle: .monthly, anchor: day(2025, 1, 10), status: .ended)
+        let f = forecaster(balance: "100.00", asOf: day(2025, 1, 1), [active, paused, ended])
+        #expect(f.projectedBalance(on: day(2025, 2, 28)) == dec("80.00"))
+    }
 }

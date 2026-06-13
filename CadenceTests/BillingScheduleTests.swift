@@ -30,4 +30,11 @@ struct BillingScheduleTests {
         let result = sched.occurrences(in: DateInterval(start: day(2025, 1, 1), end: day(2025, 4, 30)))
         #expect(result == [day(2025, 1, 15), day(2025, 2, 15), day(2025, 3, 15), day(2025, 4, 15)])
     }
+
+    @Test func monthlyClampsToShortMonths() {
+        let sched = schedule(day(2025, 1, 31), .monthly)
+        let result = sched.occurrences(in: DateInterval(start: day(2025, 1, 1), end: day(2025, 4, 30)))
+        // Feb 2025 has 28 days; the "31" returns in March, proving we compute from the anchor.
+        #expect(result == [day(2025, 1, 31), day(2025, 2, 28), day(2025, 3, 31), day(2025, 4, 30)])
+    }
 }

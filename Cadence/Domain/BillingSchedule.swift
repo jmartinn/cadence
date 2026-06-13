@@ -30,4 +30,15 @@ struct BillingSchedule: Sendable {
         }
         return result
     }
+
+    /// The first charge strictly after `date` (the anchor counts if it's after `date`).
+    func nextOccurrence(after date: Date) -> Date? {
+        var n = 0
+        while n < Self.maxIterations {
+            guard let candidate = calendar.date(byAdding: cycle.components(times: n), to: anchorDate) else { return nil }
+            if candidate > date { return candidate }
+            n += 1
+        }
+        return nil
+    }
 }

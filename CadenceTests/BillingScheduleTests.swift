@@ -68,4 +68,20 @@ struct BillingScheduleTests {
         let result = sched.occurrences(in: DateInterval(start: day(2025, 1, 1), end: day(2025, 8, 31)))
         #expect(result == [day(2025, 6, 1), day(2025, 7, 1), day(2025, 8, 1)])
     }
+
+    @Test func nextOccurrenceReturnsFirstChargeStrictlyAfter() {
+        let sched = schedule(day(2025, 1, 15), .monthly)
+        #expect(sched.nextOccurrence(after: day(2025, 1, 20)) == day(2025, 2, 15))
+    }
+
+    @Test func nextOccurrenceSkipsAnExactMatch() {
+        let sched = schedule(day(2025, 1, 15), .monthly)
+        // "after" is strict: asking after an exact occurrence returns the following one
+        #expect(sched.nextOccurrence(after: day(2025, 1, 15)) == day(2025, 2, 15))
+    }
+
+    @Test func nextOccurrenceBeforeAnchorReturnsAnchor() {
+        let sched = schedule(day(2025, 6, 1), .monthly)
+        #expect(sched.nextOccurrence(after: day(2025, 1, 1)) == day(2025, 6, 1))
+    }
 }

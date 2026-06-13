@@ -87,4 +87,27 @@ struct ForecasterTests {
         let f = forecaster(balance: "100.00", asOf: day(2025, 1, 1), [active, paused, ended])
         #expect(f.projectedBalance(on: day(2025, 2, 28)) == dec("80.00"))
     }
+
+    @Test func monthlyTotalNormalizesYearlyToMonthly() {
+        let monthly = plan(amount: "9.99",  cycle: .monthly, anchor: day(2025, 1, 1))
+        let yearly  = plan(amount: "120.00", cycle: .yearly,  anchor: day(2025, 1, 1))
+        let f = forecaster(balance: "0.00", asOf: day(2025, 1, 1), [monthly, yearly])
+        #expect(f.monthlyTotal == dec("19.99")) // 9.99 + 120/12
+    }
+
+    @Test func yearlyTotalNormalizesMonthlyToYearly() {
+        let monthly = plan(amount: "10.00", cycle: .monthly, anchor: day(2025, 1, 1))
+        let yearly  = plan(amount: "99.00", cycle: .yearly,  anchor: day(2025, 1, 1))
+        let f = forecaster(balance: "0.00", asOf: day(2025, 1, 1), [monthly, yearly])
+        #expect(f.yearlyTotal == dec("219.00")) // 10*12 + 99
+    }
+
+    @Test func totalsIgnorePausedAndEnded() {
+        let active = plan(amount: "10.00", cycle: .monthly, anchor: day(2025, 1, 1), status: .active)
+        let paused = plan(amount: "50.00", cycle: .monthly, anchor: day(2025, 1, 1), status: .paused)
+        let ended  = plan(amount: "70.00", cycle: .yearly,  anchor: day(2025, 1, 1), status: .ended)
+        let f = forecaster(balance: "0.00", asOf: day(2025, 1, 1), [active, paused, ended])
+        #expect(f.monthlyTotal == dec("10.00"))
+        #expect(f.yearlyTotal == dec("120.00"))
+    }
 }

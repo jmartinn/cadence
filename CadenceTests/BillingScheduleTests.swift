@@ -37,4 +37,16 @@ struct BillingScheduleTests {
         // Feb 2025 has 28 days; the "31" returns in March, proving we compute from the anchor.
         #expect(result == [day(2025, 1, 31), day(2025, 2, 28), day(2025, 3, 31), day(2025, 4, 30)])
     }
+
+    @Test func yearlyClampsFeb29InNonLeapYears() {
+        let sched = schedule(day(2024, 2, 29), .yearly)
+        let result = sched.occurrences(in: DateInterval(start: day(2024, 1, 1), end: day(2028, 12, 31)))
+        #expect(result == [
+            day(2024, 2, 29),  // leap
+            day(2025, 2, 28),  // clamped
+            day(2026, 2, 28),  // clamped
+            day(2027, 2, 28),  // clamped
+            day(2028, 2, 29),  // leap again
+        ])
+    }
 }

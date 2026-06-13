@@ -56,4 +56,20 @@ struct Forecaster: Sendable {
                 }
             }
     }
+
+    /// (paid, total) for the calendar month containing `today`.
+    /// `total` = active subscriptions with at least one charge this month;
+    /// `paid`  = those whose this-month charge is on or before `today`.
+    func paidThisMonth(asOf today: Date) -> (paid: Int, total: Int) {
+        guard let month = calendar.dateInterval(of: .month, for: today) else { return (0, 0) }
+        var paid = 0
+        var total = 0
+        for plan in subscriptions where plan.status == .active {
+            let schedule = BillingSchedule(anchorDate: plan.anchorDate, cycle: plan.cycle, calendar: calendar)
+            guard let charge = schedule.occurrences(in: month).first else { continue }
+            total += 1
+            if charge <= today { paid += 1 }
+        }
+        return (paid, total)
+    }
 }

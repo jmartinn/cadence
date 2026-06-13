@@ -110,4 +110,31 @@ struct ForecasterTests {
         #expect(f.monthlyTotal == dec("10.00"))
         #expect(f.yearlyTotal == dec("120.00"))
     }
+
+    @Test func paidThisMonthCountsChargedVsDueThisMonth() {
+        let early = plan(amount: "10.00", cycle: .monthly, anchor: day(2025, 1, 5))
+        let late  = plan(amount: "10.00", cycle: .monthly, anchor: day(2025, 1, 25))
+        let f = forecaster(balance: "0.00", asOf: day(2025, 1, 1), [early, late])
+        let result = f.paidThisMonth(asOf: day(2025, 1, 15))
+        #expect(result.paid == 1)
+        #expect(result.total == 2)
+    }
+
+    @Test func paidThisMonthExcludesSubsNotDueThisMonth() {
+        let monthly = plan(amount: "10.00", cycle: .monthly, anchor: day(2025, 1, 5))
+        let yearly  = plan(amount: "99.00", cycle: .yearly,  anchor: day(2025, 3, 3))
+        let f = forecaster(balance: "0.00", asOf: day(2025, 1, 1), [monthly, yearly])
+        let result = f.paidThisMonth(asOf: day(2025, 1, 15))
+        #expect(result.paid == 1)
+        #expect(result.total == 1)
+    }
+
+    @Test func paidThisMonthIgnoresPausedAndEnded() {
+        let active = plan(amount: "10.00", cycle: .monthly, anchor: day(2025, 1, 5), status: .active)
+        let paused = plan(amount: "10.00", cycle: .monthly, anchor: day(2025, 1, 5), status: .paused)
+        let f = forecaster(balance: "0.00", asOf: day(2025, 1, 1), [active, paused])
+        let result = f.paidThisMonth(asOf: day(2025, 1, 15))
+        #expect(result.paid == 1)
+        #expect(result.total == 1)
+    }
 }

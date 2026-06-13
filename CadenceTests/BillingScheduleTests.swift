@@ -49,4 +49,23 @@ struct BillingScheduleTests {
             day(2028, 2, 29),  // leap again
         ])
     }
+
+    @Test func includesOccurrencesExactlyOnBounds() {
+        let sched = schedule(day(2025, 1, 10), .monthly)
+        // interval starts AND ends exactly on an occurrence → both included (inclusive bounds)
+        let result = sched.occurrences(in: DateInterval(start: day(2025, 1, 10), end: day(2025, 3, 10)))
+        #expect(result == [day(2025, 1, 10), day(2025, 2, 10), day(2025, 3, 10)])
+    }
+
+    @Test func rangeEntirelyBeforeAnchorIsEmpty() {
+        let sched = schedule(day(2025, 6, 1), .monthly)
+        let result = sched.occurrences(in: DateInterval(start: day(2025, 1, 1), end: day(2025, 5, 31)))
+        #expect(result.isEmpty)
+    }
+
+    @Test func futureAnchorOnlyProducesFutureOccurrences() {
+        let sched = schedule(day(2025, 6, 1), .monthly)
+        let result = sched.occurrences(in: DateInterval(start: day(2025, 1, 1), end: day(2025, 8, 31)))
+        #expect(result == [day(2025, 6, 1), day(2025, 7, 1), day(2025, 8, 1)])
+    }
 }

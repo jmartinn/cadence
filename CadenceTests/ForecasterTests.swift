@@ -60,4 +60,23 @@ struct ForecasterTests {
         let f = forecaster(balance: "1000.00", asOf: day(2025, 1, 1), [sub])
         #expect(f.projectedBalance(on: day(2026, 12, 31)) == dec("802.00")) // 1000 - 2*99
     }
+
+    @Test func chargeExactlyOnAsOfDateIsExcluded() {
+        let sub = plan(amount: "10.00", cycle: .monthly, anchor: day(2025, 1, 1))
+        let f = forecaster(balance: "100.00", asOf: day(2025, 1, 1), [sub])
+        #expect(f.projectedBalance(on: day(2025, 2, 1)) == dec("90.00"))
+    }
+
+    @Test func chargeExactlyOnTargetDateIsIncluded() {
+        let sub = plan(amount: "10.00", cycle: .monthly, anchor: day(2025, 1, 15))
+        let f = forecaster(balance: "100.00", asOf: day(2025, 1, 1), [sub])
+        #expect(f.projectedBalance(on: day(2025, 1, 15)) == dec("90.00"))
+    }
+
+    @Test func targetBeforeOrEqualAnchorReturnsBalance() {
+        let sub = plan(amount: "10.00", cycle: .monthly, anchor: day(2025, 1, 10))
+        let f = forecaster(balance: "100.00", asOf: day(2025, 6, 1), [sub])
+        #expect(f.projectedBalance(on: day(2025, 1, 1)) == dec("100.00"))
+        #expect(f.projectedBalance(on: day(2025, 6, 1)) == dec("100.00"))
+    }
 }

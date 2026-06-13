@@ -49,6 +49,19 @@ enum CadenceSchemaV1: VersionedSchema {
             self.category = category
             self.serviceKey = serviceKey
         }
+
+        /// Bridge to the pure, database-agnostic domain value type that `Forecaster`
+        /// consumes. Computed => not persisted => zero CloudKit cost (no `@Transient` needed).
+        /// Read this on the actor that owns the model (main actor in Slice 3); the returned
+        /// `SubscriptionPlan` is a `Sendable` snapshot that is safe to hand off anywhere.
+        var plan: SubscriptionPlan {
+            SubscriptionPlan(
+                amount: amount,
+                cycle: billingCycle,
+                anchorDate: anchorDate,
+                status: status
+            )
+        }
     }
 
     @Model

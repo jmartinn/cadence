@@ -74,10 +74,19 @@ enum CadenceSchemaV1: VersionedSchema {
     final class BalanceAnchor {
         var balance: Decimal = 0
         var asOfDate: Date = Date.distantPast
+        var monthlyIncome: Decimal = 0           // recurring monthly income; 0 = none
+        var incomePayday: Date = Date.distantPast // reference payday; .distantPast = no income
 
-        init(balance: Decimal, asOfDate: Date) {
+        init(
+            balance: Decimal,
+            asOfDate: Date,
+            monthlyIncome: Decimal = 0,
+            incomePayday: Date = .distantPast
+        ) {
             self.balance = balance
             self.asOfDate = asOfDate
+            self.monthlyIncome = monthlyIncome
+            self.incomePayday = incomePayday
         }
     }
 }

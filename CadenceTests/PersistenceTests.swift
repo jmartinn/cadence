@@ -65,4 +65,45 @@ struct PersistenceTests {
         #expect(got.balance == Decimal(string: "1087.02")!)
         #expect(got.asOfDate == Date(timeIntervalSince1970: 2_000_000))
     }
+
+    @Test func balanceAnchorRoundTripsIncomeFields() throws {
+        let context = ModelContext(container)
+        context.insert(BalanceAnchor(
+            balance: Decimal(string: "1000.00")!,
+            asOfDate: Date(timeIntervalSince1970: 1_000),
+            monthlyIncome: Decimal(string: "2000.00")!,
+            incomePayday: Date(timeIntervalSince1970: 2_000)
+        ))
+        try context.save()
+
+        let got = try #require(try context.fetch(FetchDescriptor<BalanceAnchor>()).first)
+        #expect(got.monthlyIncome == Decimal(string: "2000.00")!)
+        #expect(got.incomePayday == Date(timeIntervalSince1970: 2_000))
+    }
+
+    @Test func balanceAnchorIncomeDefaultsToZeroAndDistantPast() throws {
+        let context = ModelContext(container)
+        context.insert(BalanceAnchor(balance: 5, asOfDate: Date(timeIntervalSince1970: 0)))
+        try context.save()
+        let got = try #require(try context.fetch(FetchDescriptor<BalanceAnchor>()).first)
+        #expect(got.monthlyIncome == 0)
+        #expect(got.incomePayday == .distantPast)
+    }
+
+    @Test func setAnchorWritesIncomeFieldsAndUpsertsInPlace() throws {
+        let context = ModelContext(container)
+        try context.setAnchor(balance: Decimal(string: "100.00")!,
+                              asOfDate: Date(timeIntervalSince1970: 10),
+                              monthlyIncome: Decimal(string: "300.00")!,
+                              incomePayday: Date(timeIntervalSince1970: 20))
+        try context.setAnchor(balance: Decimal(string: "150.00")!,
+                              asOfDate: Date(timeIntervalSince1970: 30))   // re-anchor, income omitted
+
+        let all = try context.fetch(FetchDescriptor<BalanceAnchor>())
+        #expect(all.count == 1)                                  // upsert, not insert
+        let got = try #require(all.first)
+        #expect(got.balance == Decimal(string: "150.00")!)
+        #expect(got.monthlyIncome == 0)                          // omitted → default 0
+        #expect(got.incomePayday == .distantPast)
+    }
 }

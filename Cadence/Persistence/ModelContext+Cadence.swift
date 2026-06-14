@@ -31,16 +31,24 @@ extension ModelContext {
         return try fetch(descriptor).first
     }
 
-    /// Set or re-anchor the balance. Upserts the single anchor row in place — CloudKit
-    /// forbids `@Attribute(.unique)`, so the "one continuous anchor" invariant is enforced here.
+    /// Set or re-anchor the balance (and recurring income). Upserts the single anchor row in
+    /// place — CloudKit forbids `@Attribute(.unique)`, so "one continuous anchor" is enforced here.
     @discardableResult
-    func setAnchor(balance: Decimal, asOfDate: Date) throws -> BalanceAnchor {
+    func setAnchor(
+        balance: Decimal,
+        asOfDate: Date,
+        monthlyIncome: Decimal = 0,
+        incomePayday: Date = .distantPast
+    ) throws -> BalanceAnchor {
         if let existing = try currentAnchor() {
             existing.balance = balance
             existing.asOfDate = asOfDate
+            existing.monthlyIncome = monthlyIncome
+            existing.incomePayday = incomePayday
             return existing
         }
-        let anchor = BalanceAnchor(balance: balance, asOfDate: asOfDate)
+        let anchor = BalanceAnchor(balance: balance, asOfDate: asOfDate,
+                                   monthlyIncome: monthlyIncome, incomePayday: incomePayday)
         insert(anchor)
         return anchor
     }

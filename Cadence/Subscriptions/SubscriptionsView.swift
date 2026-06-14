@@ -125,7 +125,9 @@ struct SubscriptionsView: View {
         } label: {
             Image(systemName: "plus")
                 .font(.system(size: 24, weight: .semibold))
-                .foregroundColor(.white)
+                // Invert against the monochrome circle (same pattern as the sort pills) so the
+                // glyph stays visible in dark mode, where Color.primary becomes white.
+                .foregroundColor(Color(.systemBackground))
                 .frame(width: 58, height: 58)
                 .background(Color.primary)
                 .clipShape(Circle())

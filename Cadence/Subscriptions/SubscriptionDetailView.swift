@@ -114,7 +114,10 @@ struct SubscriptionDetailView: View {
     private var cycleName: String { subscription.billingCycle == .monthly ? "Monthly" : "Yearly" }
 
     private var nextChargeText: String {
-        guard let next = SubscriptionListPresenter.nextCharge(for: subscription, after: today, calendar: calendar) else {
+        // Only an active subscription has a meaningful upcoming charge; paused/ended ones won't
+        // bill, so a future date would mislead. (Recent charges stay — they're past history.)
+        guard subscription.status == .active,
+              let next = SubscriptionListPresenter.nextCharge(for: subscription, after: today, calendar: calendar) else {
             return "—"
         }
         return Self.nextChargeFormatter.string(from: next)

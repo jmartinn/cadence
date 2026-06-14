@@ -23,7 +23,7 @@ Builds + tests in Debug on the connected physical iPhone (no simulator) and FAIL
 
 **Dev workflow is device-first** — the app is built/run on a physical iPhone, not the simulator. Manual `xcodebuild` against a device:
 ```bash
-DEVICE_ID=$(xcrun devicectl list devices | grep -i available | grep -oE '[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}' | head -1)
+DEVICE_ID=$(xcrun devicectl list devices | grep -iE 'available|connected' | grep -oE '[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}' | head -1)
 xcodebuild build -project Cadence.xcodeproj -scheme Cadence -configuration Debug \
   -destination "platform=iOS,id=$DEVICE_ID" -allowProvisioningUpdates
 ```

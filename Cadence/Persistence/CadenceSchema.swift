@@ -31,6 +31,8 @@ enum CadenceSchemaV1: VersionedSchema {
         var status: SubscriptionStatus = SubscriptionStatus.active
         var category: String = ""
         var serviceKey: String? = nil   // optional => CloudKit-legal; NEVER @Attribute(.unique)
+        var paymentBrand: String? = nil  // display-only, e.g. "Visa"; never enters the forecast
+        var paymentLast4: String? = nil  // display-only, e.g. "4821"
 
         init(
             name: String,
@@ -39,7 +41,9 @@ enum CadenceSchemaV1: VersionedSchema {
             anchorDate: Date,
             status: SubscriptionStatus = .active,
             category: String,
-            serviceKey: String? = nil
+            serviceKey: String? = nil,
+            paymentBrand: String? = nil,
+            paymentLast4: String? = nil
         ) {
             self.name = name
             self.amount = amount
@@ -48,6 +52,8 @@ enum CadenceSchemaV1: VersionedSchema {
             self.status = status
             self.category = category
             self.serviceKey = serviceKey
+            self.paymentBrand = paymentBrand
+            self.paymentLast4 = paymentLast4
         }
 
         /// Bridge to the pure, database-agnostic domain value type that `Forecaster`

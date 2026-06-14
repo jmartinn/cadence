@@ -8,6 +8,7 @@ struct SubscriptionsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Subscription.name) private var subscriptions: [Subscription]
     @State private var sort: SubscriptionSort = .nextCharge
+    @State private var showingAdd = false
 
     private var today: Date { .now }
     private var calendar: Calendar { .current }
@@ -36,6 +37,20 @@ struct SubscriptionsView: View {
                 fab
             }
             .navigationTitle("Subscriptions")
+            .navigationDestination(for: Subscription.self) { sub in
+                SubscriptionDetailView(subscription: sub)
+            }
+            .sheet(isPresented: $showingAdd) {
+                SubscriptionFormView(mode: .add)
+            }
+            #if DEBUG
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { seedSampleData() } label: { Image(systemName: "ladybug") }
+                        .accessibilityLabel("Seed sample data")
+                }
+            }
+            #endif
         }
     }
 
@@ -49,12 +64,21 @@ struct SubscriptionsView: View {
                 sortControl
                 LazyVStack(spacing: 12) {
                     ForEach(orderedSubscriptions) { sub in
-                        SubscriptionRow(
-                            subscription: sub,
-                            nextCharge: SubscriptionListPresenter.nextCharge(
-                                for: sub, after: today, calendar: calendar
+                        NavigationLink(value: sub) {
+                            SubscriptionRow(
+                                subscription: sub,
+                                nextCharge: SubscriptionListPresenter.nextCharge(
+                                    for: sub, after: today, calendar: calendar
+                                )
                             )
-                        )
+                        }
+                        .buttonStyle(.plain)
+                        .contextMenu {
+                            Button("Delete", systemImage: "trash", role: .destructive) {
+                                modelContext.delete(sub)
+                                persist()
+                            }
+                        }
                     }
                 }
             }
@@ -97,7 +121,7 @@ struct SubscriptionsView: View {
 
     private var fab: some View {
         Button {
-            seedSampleData()
+            showingAdd = true
         } label: {
             Image(systemName: "plus")
                 .font(.system(size: 24, weight: .semibold))
@@ -111,12 +135,22 @@ struct SubscriptionsView: View {
         .accessibilityLabel("Add subscription")
     }
 
-    /// In DEBUG, the FAB seeds sample data (Slice 5 re-wires it to the Add sheet).
-    /// In release builds it is a no-op placeholder until then.
+    /// DEBUG-only action behind the toolbar's ladybug button: seeds sample subscriptions
+    /// for previews and on-device testing. Not compiled into release builds.
     private func seedSampleData() {
         #if DEBUG
         SampleSubscriptions.seed(into: modelContext)
         #endif
+    }
+
+    /// Best-effort explicit save. SwiftData autosave is the backstop, so a failure here is
+    /// deliberately non-fatal; in DEBUG we surface it to catch schema/migration mistakes early.
+    private func persist() {
+        do {
+            try modelContext.save()
+        } catch {
+            assertionFailure("SubscriptionsView save failed: \(error)")
+        }
     }
 }
 

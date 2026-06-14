@@ -15,6 +15,9 @@ struct PriceText: View {
 
     private static let symbol = "€"
 
+    /// Locale's decimal separator ("," in es/EUR, "." in en-US). Falls back to ",".
+    private static var decimalSeparator: String { Locale.current.decimalSeparator ?? "," }
+
     /// Explicit init so the amount is passed unlabeled (`PriceText(total, ...)`).
     init(
         _ amount: Decimal,
@@ -41,15 +44,20 @@ struct PriceText: View {
         let centsText = Text(parts.cents)
             .font(.system(size: centsSize, weight: .bold))
             .baselineOffset(centsSize * 0.5)
+        // Separator stays on the whole-number baseline (no offset) so it tucks under the
+        // raised cents: e.g. "17,⁹⁹".
+        let separatorText = Text(Self.decimalSeparator)
+            .font(.system(size: centsSize, weight: .bold))
 
         let money: Text = symbolPosition == .leading
-            ? symbolText + wholeText + centsText
-            : wholeText + centsText + symbolText
+            ? Text("\(symbolText)\(wholeText)\(separatorText)\(centsText)")
+            : Text("\(wholeText)\(separatorText)\(centsText)\(symbolText)")
 
         if let suffix {
-            (money + Text(suffix)
+            let suffixText = Text(suffix)
                 .font(.system(size: centsSize, weight: .regular))
-                .foregroundColor(.secondary))
+                .foregroundColor(.secondary)
+            Text("\(money)\(suffixText)")
         } else {
             money
         }

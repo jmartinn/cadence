@@ -37,7 +37,7 @@ struct SubscriptionRow: View {
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(Color(.tertiaryLabel))
         }
-        .padding(12)
+        .padding(16)
         .frame(maxWidth: .infinity)
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))

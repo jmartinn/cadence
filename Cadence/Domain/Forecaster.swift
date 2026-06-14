@@ -10,6 +10,11 @@ struct Forecaster: Sendable {
     let asOfDate: Date
     let subscriptions: [SubscriptionPlan]
 
+    /// Recurring monthly income credited into the projection (0 = none).
+    var monthlyIncome: Decimal = 0
+    /// Reference payday for `monthlyIncome`; `nil` = no income. Income recurs monthly from here.
+    var incomePayday: Date? = nil
+
     /// Injected so tests can pin a fixed timezone (UTC) and stay deterministic.
     var calendar: Calendar = .current
 
@@ -28,6 +33,13 @@ struct Forecaster: Sendable {
             // occurrences(in:) is inclusive of both bounds; drop the left bound to make it half-open.
             let charges = schedule.occurrences(in: window).filter { $0 > asOfDate }
             balance -= plan.amount * Decimal(charges.count)
+        }
+        // Credit income: paydays in the half-open window (asOfDate, targetDate]. Income on or
+        // before asOfDate is already in anchorBalance, so it is excluded — no double-counting.
+        if monthlyIncome > 0, let payday = incomePayday {
+            let schedule = BillingSchedule(anchorDate: payday, cycle: .monthly, calendar: calendar)
+            let credits = schedule.occurrences(in: window).filter { $0 > asOfDate }
+            balance += monthlyIncome * Decimal(credits.count)
         }
         return balance
     }

@@ -6,6 +6,7 @@ import SwiftData
 struct SubscriptionDetailView: View {
     @Bindable var subscription: Subscription
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
 
     @State private var showingEdit = false
     @State private var showingCancelConfirm = false
@@ -39,7 +40,9 @@ struct SubscriptionDetailView: View {
             }
         }
         .sheet(isPresented: $showingEdit) {
-            SubscriptionFormView(mode: .edit(subscription))
+            // On delete the model is tombstoned; pop this detail so we don't strand the user on
+            // a stale snapshot. The sheet dismisses itself first, then this dismiss pops the push.
+            SubscriptionFormView(mode: .edit(subscription), onDelete: { dismiss() })
         }
         .confirmationDialog("Cancel this subscription?", isPresented: $showingCancelConfirm, titleVisibility: .visible) {
             Button("Cancel subscription", role: .destructive) { setStatus(.ended) }

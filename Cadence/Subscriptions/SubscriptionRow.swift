@@ -15,7 +15,7 @@ struct SubscriptionRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            monogram
+            SubscriptionMonogram(name: subscription.name)
             VStack(alignment: .leading, spacing: 2) {
                 Text(subscription.name)
                     .font(.system(size: 16, weight: .bold))
@@ -42,29 +42,6 @@ struct SubscriptionRow: View {
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .shadow(color: .black.opacity(0.05), radius: 8, y: 2)
-    }
-
-    private var monogram: some View {
-        Circle()
-            .fill(monogramColor)
-            .frame(width: 44, height: 44)
-            .overlay(
-                Text(initial)
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(.white)
-            )
-    }
-
-    private var initial: String {
-        guard let first = subscription.name.first else { return "?" }
-        return String(first).uppercased()
-    }
-
-    /// Deterministic color from the name so a given service keeps its monogram tint.
-    private var monogramColor: Color {
-        let hash = subscription.name.unicodeScalars.reduce(0) { $0 &+ Int($1.value) }
-        let hue = Double(hash % 360) / 360.0
-        return Color(hue: hue, saturation: 0.55, brightness: 0.75)
     }
 
     private var cycleSuffix: String {

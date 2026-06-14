@@ -80,6 +80,15 @@ struct PriceText: View {
 
         return (String(wholeInt), String(format: "%02d", centsInt))
     }
+
+    /// Single source of truth for inline (single-`String`) money in the house style — e.g.
+    /// "90,94€" — Decimal-exact and locale-aware, matching the `PriceText` view's separator/symbol.
+    /// Assumes a **non-negative** `amount` (like the view); callers format the sign themselves,
+    /// because `split`'s whole-part flooring rounds toward −∞ and mis-renders negatives.
+    static func inlineString(_ amount: Decimal) -> String {
+        let parts = split(amount)
+        return "\(parts.whole)\(decimalSeparator)\(parts.cents)\(symbol)"
+    }
 }
 
 #Preview {

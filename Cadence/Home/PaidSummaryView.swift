@@ -24,7 +24,7 @@ struct PaidSummaryView: View {
         let mid = Text(" this month and you have paid ").foregroundColor(.secondary)
         let frac = Text("\(paid)/\(total)").fontWeight(.bold).foregroundColor(.primary)
         let orText = Text(" or ").foregroundColor(.secondary)
-        let amount = Text(Self.amountString(paidAmount)).fontWeight(.bold).foregroundColor(.primary)
+        let amount = Text(PriceText.inlineString(paidAmount)).fontWeight(.bold).foregroundColor(.primary)
         let dot = Text(".").foregroundColor(.secondary)
         return Text("\(lead)\(count)\(mid)\(frac)\(orText)\(amount)\(dot)")
     }
@@ -46,13 +46,6 @@ struct PaidSummaryView: View {
                     .overlay(Circle().stroke(Color(.systemBackground), lineWidth: 2))
             }
         }
-    }
-
-    /// €-suffixed, Decimal-exact, locale-aware separator (reuses PriceText.split).
-    private static func amountString(_ d: Decimal) -> String {
-        let parts = PriceText.split(d)
-        let sep = Locale.current.decimalSeparator ?? ","
-        return "\(parts.whole)\(sep)\(parts.cents)€"
     }
 }
 

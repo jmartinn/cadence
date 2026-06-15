@@ -17,13 +17,13 @@ struct ForecastLineView: View {
             } else {
                 // Built explicitly (not `Label`) so the arrow reads as a trailing affordance
                 // ("Set your balance →") rather than a leading icon.
-                HStack(spacing: 6) {
+                HStack(spacing: Space.sm) {
                     Text("Set your balance")
                     Image(systemName: "arrow.right")
                 }
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundColor(.primary)
-                .padding(.vertical, 14)
+                .padding(.vertical, Space.lg)
                 .frame(maxWidth: .infinity)
                 .background(Color(.secondarySystemFill), in: Capsule())
             }
@@ -32,10 +32,7 @@ struct ForecastLineView: View {
     }
 
     private func forecast(_ amount: Decimal) -> Text {
-        // `PriceText.split` floors the whole part toward −∞ and assumes non-negative input, so
-        // format the magnitude and re-apply the sign here — otherwise e.g. -50,50 renders -51,50.
-        let isNegative = amount < 0
-        let formatted = (isNegative ? "-" : "") + PriceText.inlineString(isNegative ? -amount : amount)
+        let formatted = PriceText.signedInlineString(amount)
         let lead = Text("You will end the month with ").foregroundColor(.secondary)
         let value = Text(formatted).foregroundColor(Self.balanceColor(amount)).fontWeight(.semibold)
         let dot = Text(".").foregroundColor(.secondary)

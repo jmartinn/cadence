@@ -10,7 +10,8 @@ struct SpendingHeadline: View {
                 .font(.system(size: 15))
                 .foregroundColor(.secondary)
             PriceText(monthlyTotal, symbolPosition: .leading, suffix: "/m",
-                      wholeSize: 64, symbolSize: 34, centsSize: 28)
+                      wholeSize: 64, symbolSize: 34, centsSize: 28,
+                      symbolLift: .capAligned, centsLift: .capAligned)
         }
     }
 }

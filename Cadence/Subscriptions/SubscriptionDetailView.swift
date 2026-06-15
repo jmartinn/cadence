@@ -61,7 +61,8 @@ struct SubscriptionDetailView: View {
                 .font(.system(size: 24, weight: .bold))
             statusPill
             PriceText(subscription.amount, symbolPosition: .leading, suffix: cycleSuffix,
-                      wholeSize: 48, symbolSize: 28, centsSize: 22)
+                      wholeSize: 48, symbolSize: 28, centsSize: 22,
+                      symbolLift: .capAligned, centsLift: .capAligned)
         }
     }
 

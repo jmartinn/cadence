@@ -11,7 +11,7 @@ struct PaidSummaryView: View {
     private static let clusterLimit = 2
 
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: Space.md) {
             sentence
             cluster
         }
@@ -32,7 +32,7 @@ struct PaidSummaryView: View {
     @ViewBuilder private var cluster: some View {
         let shown = Array(clusterNames.prefix(Self.clusterLimit))
         let overflow = max(0, clusterNames.count - Self.clusterLimit)
-        HStack(spacing: -8) {
+        HStack(spacing: -Space.sm) {
             ForEach(Array(shown.enumerated()), id: \.offset) { _, name in
                 SubscriptionMonogram(name: name, size: 28)
                     .overlay(Circle().stroke(Color(.systemBackground), lineWidth: 2))

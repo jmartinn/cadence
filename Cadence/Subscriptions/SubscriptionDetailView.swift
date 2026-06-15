@@ -23,13 +23,13 @@ struct SubscriptionDetailView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
+            VStack(spacing: Space.xl) {
                 header
                 infoCard
                 recentCharges
                 actions
             }
-            .padding(16)
+            .padding(Space.lg)
         }
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationBarTitleDisplayMode(.inline)
@@ -55,7 +55,7 @@ struct SubscriptionDetailView: View {
     // MARK: Header
 
     private var header: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: Space.md) {
             SubscriptionMonogram(name: subscription.name, size: 72)
             Text(subscription.name)
                 .font(.system(size: 24, weight: .bold))
@@ -66,12 +66,12 @@ struct SubscriptionDetailView: View {
     }
 
     private var statusPill: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: Space.sm) {
             Circle().fill(statusColor).frame(width: 8, height: 8)
             Text(statusText).font(.system(size: 14, weight: .medium))
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
+        .padding(.horizontal, Space.md)
+        .padding(.vertical, Space.sm)
         .background(Color(.secondarySystemFill), in: Capsule())
     }
 
@@ -98,12 +98,12 @@ struct SubscriptionDetailView: View {
     private var infoCard: some View {
         VStack(spacing: 0) {
             InfoRow(systemImage: "arrow.triangle.2.circlepath", label: "Billing cycle", value: cycleName)
-            Divider().padding(.leading, 16)
+            Divider().padding(.leading, Space.lg)
             InfoRow(systemImage: "calendar", label: "Next charge", value: nextChargeText)
-            Divider().padding(.leading, 16)
+            Divider().padding(.leading, Space.lg)
             InfoRow(systemImage: "tag", label: "Category", value: subscription.category)
             if let payment = paymentText {
-                Divider().padding(.leading, 16)
+                Divider().padding(.leading, Space.lg)
                 InfoRow(systemImage: "creditcard", label: "Payment method", value: payment)
             }
         }
@@ -137,12 +137,12 @@ struct SubscriptionDetailView: View {
 
     @ViewBuilder private var recentCharges: some View {
         if !charges.isEmpty {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: Space.md) {
                 Text("Recent charges").font(.system(size: 18, weight: .bold))
                 VStack(spacing: 0) {
                     ForEach(charges) { charge in
                         HStack {
-                            VStack(alignment: .leading, spacing: 2) {
+                            VStack(alignment: .leading, spacing: Space.xs) {
                                 Text(Self.chargeDateFormatter.string(from: charge.date))
                                     .font(.system(size: 16, weight: .semibold))
                                 Text("Posted")
@@ -153,9 +153,9 @@ struct SubscriptionDetailView: View {
                             PriceText(charge.amount, symbolPosition: .trailing,
                                       wholeSize: 16, symbolSize: 16, centsSize: 11)
                         }
-                        .padding(16)
+                        .padding(Space.lg)
                         if charge.id != charges.last?.id {
-                            Divider().padding(.leading, 16)
+                            Divider().padding(.leading, Space.lg)
                         }
                     }
                 }
@@ -169,7 +169,7 @@ struct SubscriptionDetailView: View {
     // MARK: Actions
 
     @ViewBuilder private var actions: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: Space.md) {
             switch subscription.status {
             case .active:
                 actionButton("Pause subscription", systemImage: "pause.fill") { setStatus(.paused) }
@@ -188,7 +188,7 @@ struct SubscriptionDetailView: View {
             Label(title, systemImage: systemImage)
                 .fontWeight(.semibold)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
+                .padding(.vertical, Space.lg)
         }
         .background(Color(.secondarySystemFill), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
         .foregroundStyle(.primary)
@@ -199,7 +199,7 @@ struct SubscriptionDetailView: View {
             Label("Cancel subscription", systemImage: "xmark")
                 .fontWeight(.semibold)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
+                .padding(.vertical, Space.lg)
         }
         .background(Color.red.opacity(0.12), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
         .foregroundStyle(.red)

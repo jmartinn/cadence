@@ -11,7 +11,7 @@ struct HomeMonthHeader: View {
 
     var body: some View {
         ZStack {
-            HStack(spacing: 18) {
+            HStack(spacing: Space.lg) {
                 Image(systemName: "chevron.left")
                 Text(Self.formatter.string(from: month))
                     .font(.system(size: 18, weight: .bold))

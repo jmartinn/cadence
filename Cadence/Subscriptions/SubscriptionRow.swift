@@ -14,9 +14,9 @@ struct SubscriptionRow: View {
     }()
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: Space.md) {
             SubscriptionMonogram(name: subscription.name)
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: Space.xs) {
                 Text(subscription.name)
                     .font(.system(size: 16, weight: .bold))
                     .foregroundColor(.primary)
@@ -24,7 +24,7 @@ struct SubscriptionRow: View {
                     .font(.system(size: 13))
                     .foregroundColor(.secondary)
             }
-            Spacer(minLength: 8)
+            Spacer(minLength: Space.sm)
             PriceText(
                 subscription.amount,
                 symbolPosition: .trailing,
@@ -37,7 +37,7 @@ struct SubscriptionRow: View {
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(Color(.tertiaryLabel))
         }
-        .padding(16)
+        .padding(Space.lg)
         .frame(maxWidth: .infinity)
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))

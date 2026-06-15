@@ -7,7 +7,7 @@ struct MonthCalendarView: View {
     let weeks: [MonthCalendar.Week]
     var calendar: Calendar = .current
 
-    private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: Space.xs), count: 7)
     private static let weekdays = ["M", "T", "W", "T", "F", "S", "S"]
 
     private var flatDays: [MonthCalendar.Day] { weeks.flatMap(\.days) }
@@ -16,13 +16,13 @@ struct MonthCalendarView: View {
     }
 
     var body: some View {
-        VStack(spacing: 8) {
-            LazyVGrid(columns: columns, spacing: 8) {
+        VStack(spacing: Space.sm) {
+            LazyVGrid(columns: columns, spacing: Space.sm) {
                 ForEach(Array(Self.weekdays.enumerated()), id: \.offset) { _, symbol in
                     Text(symbol).font(.system(size: 13, weight: .medium)).foregroundColor(.secondary)
                 }
             }
-            LazyVGrid(columns: columns, spacing: 8) {
+            LazyVGrid(columns: columns, spacing: Space.sm) {
                 ForEach(flatDays) { day in
                     CalendarDayCell(day: day, calendar: calendar,
                                     showsAddAffordance: day.id == firstTrailingPaddingID)
@@ -72,7 +72,7 @@ struct CalendarDayCell: View {
                 .foregroundColor(Color(.tertiaryLabel))
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
-            VStack(spacing: 2) {
+            VStack(spacing: Space.xs) {
                 Text(number)
                     .font(.system(size: 15, weight: day.isToday ? .bold : .regular))
                     .foregroundColor(day.isToday ? Color(.systemBackground) : .primary)

@@ -5,7 +5,7 @@ struct SpendingHeadline: View {
     let monthlyTotal: Decimal
 
     var body: some View {
-        VStack(spacing: 2) {
+        VStack(spacing: Space.xs) {
             Text("Total spending")
                 .font(.system(size: 15))
                 .foregroundColor(.secondary)

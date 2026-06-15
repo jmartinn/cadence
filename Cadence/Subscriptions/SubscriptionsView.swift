@@ -56,13 +56,13 @@ struct SubscriptionsView: View {
 
     private var content: some View {
         ScrollView {
-            VStack(spacing: 16) {
+            VStack(spacing: Space.lg) {
                 SubscriptionSummaryCard(
                     monthly: forecaster.monthlyTotal,
                     yearly: forecaster.yearlyTotal
                 )
                 sortControl
-                LazyVStack(spacing: 12) {
+                LazyVStack(spacing: Space.md) {
                     ForEach(orderedSubscriptions) { sub in
                         NavigationLink(value: sub) {
                             SubscriptionRow(
@@ -82,13 +82,13 @@ struct SubscriptionsView: View {
                     }
                 }
             }
-            .padding(16)
-            .padding(.bottom, 96) // clear the FAB
+            .padding(Space.lg)
+            .padding(.bottom, 96) // clear the FAB (on-grid: 24×4, larger than the named scale)
         }
     }
 
     private var sortControl: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: Space.sm) {
             Text("Sort by")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
@@ -98,8 +98,8 @@ struct SubscriptionsView: View {
                 } label: {
                     Text(option.title)
                         .font(.system(size: 13, weight: .semibold))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
+                        .padding(.horizontal, Space.md)
+                        .padding(.vertical, Space.sm)
                         .background(sort == option ? Color.primary : Color(.tertiarySystemFill))
                         .foregroundColor(sort == option ? Color(.systemBackground) : .secondary)
                         .clipShape(Capsule())
@@ -133,7 +133,7 @@ struct SubscriptionsView: View {
                 .clipShape(Circle())
                 .shadow(color: .black.opacity(0.3), radius: 8, y: 4)
         }
-        .padding(.bottom, 24)
+        .padding(.bottom, Space.xl)
         .accessibilityLabel("Add subscription")
     }
 

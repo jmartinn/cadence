@@ -27,20 +27,22 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 24) {
+                VStack(spacing: Space.xl) {
                     HomeMonthHeader(month: today)
                     SpendingHeadline(monthlyTotal: summary.monthlyTotal)
                     PaidSummaryView(paid: summary.paid, total: summary.total,
                                     paidAmount: summary.paidAmount, clusterNames: summary.clusterNames)
                         .font(.system(size: 15))
                         .multilineTextAlignment(.center)
+                        .padding(.horizontal, Space.md)
                     ForecastLineView(projected: summary.projectedEndOfMonth) { showingAnchorSheet = true }
+                        .padding(.horizontal, Space.md)
                     MonthCalendarView(weeks: weeks, calendar: calendar)
                     if !renewing.isEmpty {
                         RenewingSection(items: renewing) { router.selection = TabRouter.subscriptions }
                     }
                 }
-                .padding(16)
+                .padding(Space.lg)
             }
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .navigationDestination(for: Subscription.self) { SubscriptionDetailView(subscription: $0) }

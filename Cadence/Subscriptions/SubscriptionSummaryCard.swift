@@ -12,7 +12,7 @@ struct SubscriptionSummaryCard: View {
             Divider().frame(height: 40)
             half(label: "Per year", amount: yearly)
         }
-        .padding(.vertical, 16)
+        .padding(.vertical, Space.lg)
         .frame(maxWidth: .infinity)
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
@@ -20,7 +20,7 @@ struct SubscriptionSummaryCard: View {
     }
 
     private func half(label: String, amount: Decimal) -> some View {
-        VStack(spacing: 4) {
+        VStack(spacing: Space.xs) {
             Text(label)
                 .font(.footnote)
                 .foregroundColor(.secondary)

@@ -8,22 +8,22 @@ struct InfoRow: View {
     let value: String
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: Space.md) {
             Image(systemName: systemImage)
                 .font(.system(size: 18))
                 .foregroundStyle(.secondary)
                 .frame(width: 24)
             Text(label)
                 .foregroundStyle(.secondary)
-            Spacer(minLength: 8)
+            Spacer(minLength: Space.sm)
             Text(value)
                 .fontWeight(.semibold)
                 .foregroundStyle(.primary)
                 .multilineTextAlignment(.trailing)
         }
         .font(.system(size: 16))
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
+        .padding(.horizontal, Space.lg)
+        .padding(.vertical, Space.lg)
     }
 }
 

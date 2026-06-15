@@ -7,13 +7,13 @@ struct RenewingSection: View {
     let onSeeAll: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: Space.md) {
             HStack {
                 Text("Renewing this month").font(.system(size: 18, weight: .bold))
                 Spacer()
                 Button("See all", action: onSeeAll).font(.system(size: 15))
             }
-            LazyVStack(spacing: 12) {
+            LazyVStack(spacing: Space.md) {
                 ForEach(items) { item in
                     NavigationLink(value: item.subscription) {
                         SubscriptionRow(subscription: item.subscription, nextCharge: item.chargeDate)

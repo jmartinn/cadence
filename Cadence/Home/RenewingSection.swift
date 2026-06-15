@@ -6,6 +6,9 @@ struct RenewingSection: View {
     let items: [HomeSummary.RenewingItem]
     let onSeeAll: () -> Void
 
+    /// Matches the Figma: at most 4 rows inline; the rest live behind "See all".
+    private static let displayLimit = 4
+
     var body: some View {
         VStack(alignment: .leading, spacing: Space.md) {
             HStack {
@@ -14,7 +17,7 @@ struct RenewingSection: View {
                 Button("See all", action: onSeeAll).font(.system(size: 15))
             }
             LazyVStack(spacing: Space.md) {
-                ForEach(items) { item in
+                ForEach(items.prefix(Self.displayLimit)) { item in
                     NavigationLink(value: item.subscription) {
                         SubscriptionRow(subscription: item.subscription, nextCharge: item.chargeDate)
                     }

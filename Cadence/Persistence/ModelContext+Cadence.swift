@@ -33,6 +33,11 @@ extension ModelContext {
 
     /// Set or re-anchor the balance (and recurring income). Upserts the single anchor row in
     /// place — CloudKit forbids `@Attribute(.unique)`, so "one continuous anchor" is enforced here.
+    ///
+    /// This is a **full-replace upsert (PUT, not PATCH)**: every call overwrites all four fields, so
+    /// omitting `monthlyIncome`/`incomePayday` resets them to "no income" (0 / `.distantPast`) — see
+    /// `PersistenceTests.setAnchorWritesIncomeFieldsAndUpsertsInPlace`. Callers must always pass the
+    /// complete anchor state; the only mutation path (`AnchorDraft.apply`) does.
     @discardableResult
     func setAnchor(
         balance: Decimal,

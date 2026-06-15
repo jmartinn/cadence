@@ -19,10 +19,12 @@ struct Forecaster: Sendable {
     var calendar: Calendar = .current
 
     /// Projected balance on `targetDate`:
-    ///   anchorBalance − Σ (amount of every active charge in the half-open window (asOfDate, targetDate])
+    ///   anchorBalance − Σ (active charges in the half-open window (asOfDate, targetDate])
+    ///                 + Σ (monthlyIncome on each payday in that same window)
     ///
-    /// A charge exactly on `asOfDate` is already baked into the balance, so it is excluded;
-    /// a charge exactly on `targetDate` is included. If `targetDate <= asOfDate`, nothing is
+    /// A charge/payday exactly on `asOfDate` is already baked into the balance, so it is excluded;
+    /// one exactly on `targetDate` is included. Income is credited symmetrically to charges, only
+    /// for paydays after `asOfDate` (no double-count). If `targetDate <= asOfDate`, nothing is
     /// projected and the anchor balance is returned unchanged.
     func projectedBalance(on targetDate: Date) -> Decimal {
         guard targetDate > asOfDate else { return anchorBalance }

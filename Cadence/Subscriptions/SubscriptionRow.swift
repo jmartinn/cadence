@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// A single subscription card in the list. Non-navigating in Slice 4 (Slice 5 wires the tap
-/// to the detail screen). Receives the precomputed `nextCharge` so it only formats — it does
-/// not own schedule math.
+/// A single subscription card in the list and in Home's "Renewing this month" section. The host
+/// wraps it in a `NavigationLink` to the detail screen. Receives the precomputed `nextCharge` so
+/// it only formats — it does not own schedule math.
 struct SubscriptionRow: View {
     let subscription: Subscription
     let nextCharge: Date?

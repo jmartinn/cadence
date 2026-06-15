@@ -26,6 +26,8 @@ struct ForecastLineView: View {
                 .padding(.vertical, Space.lg)
                 .frame(maxWidth: .infinity)
                 .background(Color(.secondarySystemFill), in: Capsule())
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Set your balance to see your month-end forecast")
             }
         }
         .buttonStyle(.plain)

@@ -55,7 +55,7 @@ struct HomeView: View {
 #Preview {
     let container = CadenceStore.inMemory()
     SampleSubscriptions.seed(into: container.mainContext)
-    try? container.mainContext.setAnchor(
+    _ = try? container.mainContext.setAnchor(
         balance: Decimal(string: "1116.00")!, asOfDate: .now,
         monthlyIncome: Decimal(string: "0.00")!, incomePayday: .distantPast
     )

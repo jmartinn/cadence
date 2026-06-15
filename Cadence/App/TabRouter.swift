@@ -5,7 +5,7 @@ import Observation
 /// Lives in the environment, set by `RootTabView`.
 @Observable
 final class TabRouter {
-    var selection: Int = TabRouter.subscriptions
+    var selection: Int = TabRouter.home   // Home is the forecast dashboard → the natural landing tab
 
     static let home = 0
     static let subscriptions = 1

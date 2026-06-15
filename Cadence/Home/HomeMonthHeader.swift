@@ -15,11 +15,13 @@ struct HomeMonthHeader: View {
 
     var body: some View {
         ZStack {
-            HStack(spacing: Space.lg) {
+            HStack(spacing: 0) {
                 Button(action: onPrevious) {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(canGoBack ? .primary : Color(.tertiaryLabel))
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                 }
                 .disabled(!canGoBack)
 
@@ -31,6 +33,8 @@ struct HomeMonthHeader: View {
                     Image(systemName: "chevron.right")
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.primary)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                 }
             }
 

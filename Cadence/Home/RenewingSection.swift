@@ -1,8 +1,10 @@
 import SwiftUI
 
-/// "Renewing this month" + "See all". Each row reuses `SubscriptionRow`, showing the month's
+/// Renewing header + "See all". Each row reuses `SubscriptionRow`, showing the month's
 /// charge date, and pushes to the subscription's detail via the host `NavigationStack`.
+/// `title` is supplied by the caller ("Renewing this month" or "Renewing in {Month}").
 struct RenewingSection: View {
+    var title: String
     let items: [HomeSummary.RenewingItem]
     let onSeeAll: () -> Void
 
@@ -12,7 +14,7 @@ struct RenewingSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Space.md) {
             HStack {
-                Text("Renewing this month").font(.system(size: 18, weight: .bold))
+                Text(title).font(.system(size: 18, weight: .bold))
                 Spacer()
                 Button("See all", action: onSeeAll).font(.system(size: 15))
             }

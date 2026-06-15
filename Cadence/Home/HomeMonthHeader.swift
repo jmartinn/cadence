@@ -1,9 +1,13 @@
 import SwiftUI
 
-/// Top bar: centered month label flanked by chevrons, with a trailing profile button.
-/// Chevrons and profile are INERT this slice (month nav = deferred; Settings = deferred).
+/// Top bar: centered month label flanked by nav chevrons, with a trailing profile button.
+/// Forward-only navigation: the left chevron is disabled at the current-month floor.
+/// Profile button is INERT this slice (Settings = deferred).
 struct HomeMonthHeader: View {
     let month: Date
+    var canGoBack: Bool
+    var onPrevious: () -> Void
+    var onNext: () -> Void
 
     private static let formatter: DateFormatter = {
         let f = DateFormatter(); f.setLocalizedDateFormatFromTemplate("MMMMyyyy"); return f
@@ -12,14 +16,23 @@ struct HomeMonthHeader: View {
     var body: some View {
         ZStack {
             HStack(spacing: Space.lg) {
-                Image(systemName: "chevron.left")
+                Button(action: onPrevious) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(canGoBack ? .primary : Color(.tertiaryLabel))
+                }
+                .disabled(!canGoBack)
+
                 Text(Self.formatter.string(from: month))
                     .font(.system(size: 18, weight: .bold))
                     .foregroundColor(.primary)
-                Image(systemName: "chevron.right")
+
+                Button(action: onNext) {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.primary)
+                }
             }
-            .font(.system(size: 16, weight: .semibold))
-            .foregroundColor(Color(.tertiaryLabel))   // dimmed: nav not active yet
 
             HStack {
                 Spacer()
@@ -35,5 +48,10 @@ struct HomeMonthHeader: View {
 }
 
 #Preview {
-    HomeMonthHeader(month: Date(timeIntervalSince1970: 1_764_547_200)).padding()
+    HomeMonthHeader(
+        month: Date(timeIntervalSince1970: 1_764_547_200),
+        canGoBack: true,
+        onPrevious: {},
+        onNext: {}
+    ).padding()
 }

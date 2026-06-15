@@ -1,48 +1,80 @@
 import SwiftUI
 import SwiftData
 
-/// The Home tab: forecast dashboard for the current month. MV — derivation lives in `HomeSummary`
+/// The Home tab: forecast dashboard for the displayed month. MV — derivation lives in `HomeSummary`
 /// and `MonthCalendar`; the view only composes. Reads subscriptions and the anchor via `@Query`.
+/// Navigation is forward-only: `displayedMonth` is always >= the current calendar month.
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(TabRouter.self) private var router
     @Query private var subscriptions: [Subscription]
     @Query(sort: \BalanceAnchor.asOfDate, order: .reverse) private var anchors: [BalanceAnchor]
     @State private var showingAnchorSheet = false
+    @State private var displayedMonth: Date = MonthNavigation.startOfMonth(for: .now, calendar: .current)
 
     private var today: Date { .now }
     private var calendar: Calendar { .current }
     private var anchor: BalanceAnchor? { anchors.first }
 
+    private var isViewingCurrentMonth: Bool {
+        calendar.isDate(displayedMonth, equalTo: today, toGranularity: .month)
+    }
+
+    private static let monthFormatter: DateFormatter = {
+        let f = DateFormatter(); f.dateFormat = "MMMM"; return f
+    }()
+
     private var summary: HomeSummary {
-        HomeSummary.make(subscriptions: subscriptions, anchor: anchor, today: today, calendar: calendar)
+        HomeSummary.make(subscriptions: subscriptions, anchor: anchor,
+                         referenceDate: displayedMonth, today: today, calendar: calendar)
     }
     private var weeks: [MonthCalendar.Week] {
-        MonthCalendar.weeks(for: today, subscriptions: subscriptions, today: today, calendar: calendar)
+        MonthCalendar.weeks(for: displayedMonth, subscriptions: subscriptions,
+                            today: today, calendar: calendar)
     }
     private var renewing: [HomeSummary.RenewingItem] {
-        HomeSummary.renewing(subscriptions: subscriptions, today: today, calendar: calendar)
+        HomeSummary.renewing(subscriptions: subscriptions,
+                             referenceDate: displayedMonth, calendar: calendar)
     }
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: Space.xl) {
-                    HomeMonthHeader(month: today)
+                    HomeMonthHeader(
+                        month: displayedMonth,
+                        canGoBack: MonthNavigation.canGoBack(from: displayedMonth, today: today, calendar: calendar),
+                        onPrevious: {
+                            displayedMonth = MonthNavigation.advanced(from: displayedMonth, by: -1,
+                                                                      today: today, calendar: calendar)
+                        },
+                        onNext: {
+                            displayedMonth = MonthNavigation.advanced(from: displayedMonth, by: 1,
+                                                                      today: today, calendar: calendar)
+                        }
+                    )
                     SpendingHeadline(monthlyTotal: summary.monthlyTotal)
-                    PaidSummaryView(paid: summary.paid, total: summary.total,
-                                    paidAmount: summary.paidAmount, clusterNames: summary.clusterNames)
-                        .font(.system(size: 15))
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, Space.md)
+                    if isViewingCurrentMonth {
+                        PaidSummaryView(paid: summary.paid, total: summary.total,
+                                        paidAmount: summary.paidAmount, clusterNames: summary.clusterNames)
+                            .font(.system(size: 15))
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, Space.md)
+                    }
                     ForecastLineView(projected: summary.projectedEndOfMonth) { showingAnchorSheet = true }
                         .padding(.horizontal, Space.md)
                     MonthCalendarView(weeks: weeks, calendar: calendar)
                     if !renewing.isEmpty {
-                        RenewingSection(items: renewing) { router.selection = TabRouter.subscriptions }
+                        RenewingSection(
+                            title: isViewingCurrentMonth
+                                ? "Renewing this month"
+                                : "Renewing in \(Self.monthFormatter.string(from: displayedMonth))",
+                            items: renewing
+                        ) { router.selection = TabRouter.subscriptions }
                     }
                 }
                 .padding(Space.lg)
+                .animation(.easeInOut(duration: 0.2), value: displayedMonth)
             }
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .navigationDestination(for: Subscription.self) { SubscriptionDetailView(subscription: $0) }

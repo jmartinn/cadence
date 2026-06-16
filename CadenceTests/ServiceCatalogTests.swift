@@ -73,4 +73,8 @@ struct ServiceCatalogTests {
             #expect(!brand.displayName.isEmpty, "empty displayName for \(brand.slug)")
         }
     }
+
+    @Test func catalogIsBroad() {
+        #expect(ServiceCatalog.all.count >= 50, "spec §11.3 requires a broad (50+) catalog")
+    }
 }

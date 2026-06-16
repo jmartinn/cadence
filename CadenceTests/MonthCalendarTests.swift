@@ -1,4 +1,5 @@
 @testable import Cadence
+import CadenceKit
 import Foundation
 import Testing
 

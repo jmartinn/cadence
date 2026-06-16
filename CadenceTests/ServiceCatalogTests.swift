@@ -1,6 +1,6 @@
+@testable import Cadence
 import SwiftUI
 import Testing
-@testable import Cadence
 
 struct ServiceCatalogTests {
     @Test func normalizeStripsCaseAndPunctuation() {
@@ -57,7 +57,7 @@ struct ServiceCatalogTests {
         var keys: [String] = []
         for brand in ServiceCatalog.all {
             keys.append(ServiceCatalog.normalize(brand.slug))
-            keys.append(contentsOf: brand.aliases.map(ServiceCatalog.normalize))
+            keys.append(contentsOf: brand.aliases.map { ServiceCatalog.normalize($0) })
         }
         #expect(Set(keys).count == keys.count, "alias/slug collision in catalog")
     }

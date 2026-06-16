@@ -45,4 +45,32 @@ struct ServiceCatalogTests {
             #expect(ServiceCatalog.brand(serviceKey: key, name: "") != nil, "\(key) must resolve")
         }
     }
+
+    @Test func everySlugIsUnique() {
+        let slugs = ServiceCatalog.all.map(\.slug)
+        #expect(Set(slugs).count == slugs.count, "duplicate slug in catalog")
+    }
+
+    @Test func noNormalizedKeyCollisions() {
+        // Every slug + alias, normalized, must be globally unique — otherwise one entry
+        // silently shadows another in the lookup index.
+        var keys: [String] = []
+        for brand in ServiceCatalog.all {
+            keys.append(ServiceCatalog.normalize(brand.slug))
+            keys.append(contentsOf: brand.aliases.map(ServiceCatalog.normalize))
+        }
+        #expect(Set(keys).count == keys.count, "alias/slug collision in catalog")
+    }
+
+    @Test func everyHexParses() {
+        for brand in ServiceCatalog.all {
+            #expect(Color(hex: brand.hex) != nil, "bad hex for \(brand.slug): \(brand.hex)")
+        }
+    }
+
+    @Test func everyDisplayNameIsNonEmpty() {
+        for brand in ServiceCatalog.all {
+            #expect(!brand.displayName.isEmpty, "empty displayName for \(brand.slug)")
+        }
+    }
 }

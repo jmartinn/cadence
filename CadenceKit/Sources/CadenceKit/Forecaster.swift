@@ -5,18 +5,34 @@ import Foundation
 /// Pure value type — no SwiftData, no UI. Initialized with the anchor `(balance, asOfDate)`
 /// and the current subscriptions, then queried repeatedly. Every projection is anchored to
 /// the same continuous timeline; there are no month boundaries in the model.
-struct Forecaster: Sendable {
-    let anchorBalance: Decimal
-    let asOfDate: Date
-    let subscriptions: [SubscriptionPlan]
+public struct Forecaster: Sendable {
+    public let anchorBalance: Decimal
+    public let asOfDate: Date
+    public let subscriptions: [SubscriptionPlan]
 
     /// Recurring monthly income credited into the projection (0 = none).
-    var monthlyIncome: Decimal = 0
+    public var monthlyIncome: Decimal = 0
     /// Reference payday for `monthlyIncome`; `nil` = no income. Income recurs monthly from here.
-    var incomePayday: Date? = nil
+    public var incomePayday: Date?
 
     /// Injected so tests can pin a fixed timezone (UTC) and stay deterministic.
-    var calendar: Calendar = .current
+    public var calendar: Calendar = .current
+
+    public init(
+        anchorBalance: Decimal,
+        asOfDate: Date,
+        subscriptions: [SubscriptionPlan],
+        monthlyIncome: Decimal = 0,
+        incomePayday: Date? = nil,
+        calendar: Calendar = .current
+    ) {
+        self.anchorBalance = anchorBalance
+        self.asOfDate = asOfDate
+        self.subscriptions = subscriptions
+        self.monthlyIncome = monthlyIncome
+        self.incomePayday = incomePayday
+        self.calendar = calendar
+    }
 
     /// Projected balance on `targetDate`:
     ///   anchorBalance − Σ (active charges in the half-open window (asOfDate, targetDate])
@@ -26,7 +42,7 @@ struct Forecaster: Sendable {
     /// one exactly on `targetDate` is included. Income is credited symmetrically to charges, only
     /// for paydays after `asOfDate` (no double-count). If `targetDate <= asOfDate`, nothing is
     /// projected and the anchor balance is returned unchanged.
-    func projectedBalance(on targetDate: Date) -> Decimal {
+    public func projectedBalance(on targetDate: Date) -> Decimal {
         guard targetDate > asOfDate else { return anchorBalance }
         let window = DateInterval(start: asOfDate, end: targetDate)
         var balance = anchorBalance
@@ -47,14 +63,14 @@ struct Forecaster: Sendable {
     }
 
     /// Sum of active subscriptions normalized to a monthly amount. Exact `Decimal`; the UI rounds for display.
-    var monthlyTotal: Decimal {
+    public var monthlyTotal: Decimal {
         subscriptions
             .filter { $0.status == .active }
             .reduce(into: .zero) { $0 += $1.normalizedMonthlyAmount }
     }
 
     /// Sum of active subscriptions normalized to a yearly amount. Exact `Decimal`; the UI rounds for display.
-    var yearlyTotal: Decimal {
+    public var yearlyTotal: Decimal {
         subscriptions
             .filter { $0.status == .active }
             .reduce(into: .zero) { $0 += $1.normalizedYearlyAmount }
@@ -63,7 +79,7 @@ struct Forecaster: Sendable {
     /// (paid, total) for the calendar month containing `today`.
     /// `total` = active subscriptions with at least one charge this month;
     /// `paid`  = those whose this-month charge is on or before `today`.
-    func paidThisMonth(asOf today: Date) -> (paid: Int, total: Int) {
+    public func paidThisMonth(asOf today: Date) -> (paid: Int, total: Int) {
         guard let month = calendar.dateInterval(of: .month, for: today) else { return (0, 0) }
         var paid = 0
         var total = 0

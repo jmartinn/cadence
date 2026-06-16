@@ -4,7 +4,7 @@ import Foundation
 ///
 /// `String`-backed + `Codable` + `CaseIterable` so later slices can persist it
 /// (SwiftData) and list it in a SwiftUI `Picker`. `Sendable` because it's a pure value.
-enum BillingCycle: String, Codable, CaseIterable, Sendable {
+public enum BillingCycle: String, Codable, CaseIterable, Sendable {
     case monthly
     case yearly
 

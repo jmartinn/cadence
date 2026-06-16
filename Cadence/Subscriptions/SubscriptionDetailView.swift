@@ -1,3 +1,4 @@
+import CadenceKit
 import SwiftData
 import SwiftUI
 

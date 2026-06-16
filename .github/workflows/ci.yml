@@ -34,3 +34,32 @@ jobs:
           echo "## iOS SDKs"; xcodebuild -showsdks | grep -i ios || true
           echo "## Simulator runtimes"; xcrun simctl list runtimes | grep -i ios || true
           echo "## iPhone simulators"; xcrun simctl list devices available | grep -i iphone || true
+
+      - name: Install pinned swiftformat + swiftlint
+        run: |
+          set -euo pipefail
+          TOOLS="$RUNNER_TEMP/tools"
+          mkdir -p "$TOOLS"
+
+          curl -fsSL -o "$TOOLS/swiftlint.zip" \
+            https://github.com/realm/SwiftLint/releases/download/0.63.3/portable_swiftlint.zip
+          unzip -o -q "$TOOLS/swiftlint.zip" -d "$TOOLS/swiftlint"
+
+          curl -fsSL -o "$TOOLS/swiftformat.zip" \
+            https://github.com/nicklockwood/SwiftFormat/releases/download/0.61.1/swiftformat.zip
+          unzip -o -q "$TOOLS/swiftformat.zip" -d "$TOOLS/swiftformat"
+
+          # Locate the unzipped binaries (archive layout can nest them) and expose on PATH.
+          SWIFTLINT_BIN="$(find "$TOOLS/swiftlint" -name swiftlint -type f -perm +111 | head -1)"
+          SWIFTFORMAT_BIN="$(find "$TOOLS/swiftformat" -name swiftformat -type f -perm +111 | head -1)"
+          mkdir -p "$TOOLS/bin"
+          ln -sf "$SWIFTLINT_BIN" "$TOOLS/bin/swiftlint"
+          ln -sf "$SWIFTFORMAT_BIN" "$TOOLS/bin/swiftformat"
+          echo "$TOOLS/bin" >> "$GITHUB_PATH"
+
+          # Assert exact versions (fail loudly on drift).
+          test "$("$TOOLS/bin/swiftlint" version)" = "0.63.3" \
+            || { echo "::error::swiftlint version mismatch (want 0.63.3, got $("$TOOLS/bin/swiftlint" version))"; exit 1; }
+          test "$("$TOOLS/bin/swiftformat" --version)" = "0.61.1" \
+            || { echo "::error::swiftformat version mismatch (want 0.61.1, got $("$TOOLS/bin/swiftformat" --version))"; exit 1; }
+          echo "swiftlint 0.63.3 + swiftformat 0.61.1 ready"

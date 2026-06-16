@@ -15,7 +15,7 @@ struct SubscriptionRow: View {
 
     var body: some View {
         HStack(spacing: Space.md) {
-            SubscriptionMonogram(name: subscription.name)
+            SubscriptionMonogram(serviceKey: subscription.serviceKey, name: subscription.name)
             VStack(alignment: .leading, spacing: Space.xs) {
                 Text(subscription.name)
                     .font(.system(size: 16, weight: .bold))

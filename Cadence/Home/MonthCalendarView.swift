@@ -105,7 +105,7 @@ struct CalendarDayCell: View {
                     .font(.system(size: 15, weight: day.isToday ? .bold : .regular))
                     .foregroundColor(day.isToday ? Color(.systemBackground) : .primary)
                 if let marker = day.markers.first {
-                    SubscriptionMonogram(name: marker.serviceName, size: 18)
+                    SubscriptionMonogram(serviceKey: marker.subscription.serviceKey, name: marker.serviceName, size: 18)
                         .overlay(extraCountBadge)
                 }
             }

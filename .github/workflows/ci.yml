@@ -27,13 +27,6 @@ jobs:
         with:
           xcode-version: latest-stable
 
-      - name: Prepare iOS simulator platform
-        run: |
-          set -euo pipefail
-          # Register the iOS simulator platform with the selected Xcode so xcodebuild can
-          # resolve simulator destinations (idempotent — a no-op if already installed).
-          xcodebuild -downloadPlatform iOS
-
       - name: Install pinned swiftformat + swiftlint
         run: |
           set -euo pipefail

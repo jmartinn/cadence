@@ -14,6 +14,30 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  domain:
+    name: domain
+    runs-on: ubuntu-latest
+    container: swift:6.1
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Assert toolchain
+        run: |
+          set -euo pipefail
+          swift --version
+          swift --version | grep -q 'version 6' \
+            || { echo "::error::expected Swift 6.x in the container"; exit 1; }
+
+      - name: swift test (no simulator)
+        run: |
+          set -euo pipefail
+          swift test --package-path CadenceKit
+
   verify:
     name: verify
     runs-on: macos-15

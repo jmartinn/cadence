@@ -10,9 +10,9 @@ struct SubscriptionMonogram: View {
     var size: CGFloat = 44
 
     var body: some View {
-        let brand = ServiceCatalog.brand(serviceKey: serviceKey, name: name)
-        let tile = brand?.color ?? Self.color(for: name)
-        let letter = brand?.color.contrastingForeground ?? .white
+        let brandColor = ServiceCatalog.brand(serviceKey: serviceKey, name: name)?.color
+        let tile = brandColor ?? Self.color(for: name)
+        let letter = brandColor?.contrastingForeground ?? .white
         Circle()
             .fill(tile)
             .frame(width: size, height: size)

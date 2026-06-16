@@ -8,6 +8,10 @@ included:
   - Cadence
   - CadenceTests
   - CadenceUITests
+  - CadenceKit
+
+excluded:
+  - CadenceKit/.build
 
 disabled_rules:
   - trailing_comma # owned by SwiftFormat

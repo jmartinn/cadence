@@ -1,3 +1,4 @@
+import CadenceKit
 import Foundation
 
 /// Editable, validatable form state for the Add/Edit sheet — the only non-trivial logic in the

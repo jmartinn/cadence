@@ -1,3 +1,4 @@
+import CadenceKit
 import SwiftUI
 
 /// A single subscription card in the list and in Home's "Renewing this month" section. The host

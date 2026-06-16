@@ -1,3 +1,4 @@
+import CadenceKit
 import Foundation
 
 /// Builds the read-only month grid for the Home calendar. Pure value type — tested with

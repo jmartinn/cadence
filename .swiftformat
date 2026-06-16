@@ -37,4 +37,4 @@
 --disable redundantSendable
 --disable numberFormatting
 
---exclude .build,docs,scripts,.git
+--exclude .build,docs,scripts,.git,CadenceKit/.build

@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: verify
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Install pinned swiftformat + swiftlint
+        run: |
+          set -euo pipefail
+          TOOLS="$RUNNER_TEMP/tools"
+          mkdir -p "$TOOLS"
+
+          curl -fsSL -o "$TOOLS/swiftlint.zip" \
+            https://github.com/realm/SwiftLint/releases/download/0.63.3/portable_swiftlint.zip
+          unzip -o -q "$TOOLS/swiftlint.zip" -d "$TOOLS/swiftlint"
+
+          curl -fsSL -o "$TOOLS/swiftformat.zip" \
+            https://github.com/nicklockwood/SwiftFormat/releases/download/0.61.1/swiftformat.zip
+          unzip -o -q "$TOOLS/swiftformat.zip" -d "$TOOLS/swiftformat"
+
+          # Locate the unzipped binaries (archive layout can nest them) and expose on PATH.
+          SWIFTLINT_BIN="$(find "$TOOLS/swiftlint" -name swiftlint -type f -perm +111 | head -1)"
+          SWIFTFORMAT_BIN="$(find "$TOOLS/swiftformat" -name swiftformat -type f -perm +111 | head -1)"
+          mkdir -p "$TOOLS/bin"
+          ln -sf "$SWIFTLINT_BIN" "$TOOLS/bin/swiftlint"
+          ln -sf "$SWIFTFORMAT_BIN" "$TOOLS/bin/swiftformat"
+          echo "$TOOLS/bin" >> "$GITHUB_PATH"
+
+          # Assert exact versions (fail loudly on drift).
+          test "$("$TOOLS/bin/swiftlint" version)" = "0.63.3" \
+            || { echo "::error::swiftlint version mismatch (want 0.63.3, got $("$TOOLS/bin/swiftlint" version))"; exit 1; }
+          test "$("$TOOLS/bin/swiftformat" --version)" = "0.61.1" \
+            || { echo "::error::swiftformat version mismatch (want 0.61.1, got $("$TOOLS/bin/swiftformat" --version))"; exit 1; }
+          echo "swiftlint 0.63.3 + swiftformat 0.61.1 ready"
+
+      - name: Stage 1 — swiftformat --lint
+        run: |
+          set -euo pipefail
+          swiftformat Cadence CadenceTests CadenceUITests --lint
+
+      - name: Stage 2 — swiftlint
+        run: |
+          set -euo pipefail
+          LINTLOG="$RUNNER_TEMP/swiftlint.log"
+          swiftlint lint --quiet | tee "$LINTLOG" || true
+          ERRORS="$(grep -c 'error:' "$LINTLOG" || true)"
+          WARNINGS="$(grep -c 'warning:' "$LINTLOG" || true)"
+          echo "lint: ${ERRORS} error(s), ${WARNINGS} warning(s) (warnings advisory)"
+          test "$ERRORS" -eq 0 || { echo "::error::swiftlint reported $ERRORS error(s)"; exit 1; }
+
+      - name: Stage 3 — build + test (simulator, 0 warnings)
+        run: |
+          set -euo pipefail
+          BUILDLOG="$RUNNER_TEMP/xcodebuild.log"
+          set +e
+          xcodebuild test \
+            -project Cadence.xcodeproj \
+            -scheme Cadence \
+            -configuration Debug \
+            -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' \
+            -skip-testing:CadenceUITests/CadenceUITests/testLaunchPerformance \
+            -resultBundlePath "$RUNNER_TEMP/Cadence.xcresult" \
+            2>&1 | tee "$BUILDLOG"
+          STATUS=${PIPESTATUS[0]}
+          set -e
+          test "$STATUS" -eq 0 || { echo "::error::xcodebuild test failed (exit $STATUS)"; exit "$STATUS"; }
+
+          # Compiler warnings under the repo path only (ignore SDK/Xcode noise). Avoid `grep -c`,
+          # which returns exit 1 on zero matches and would abort under `set -e` — the very
+          # 0-warning case the gate is meant to pass.
+          WARNINGS="$(grep 'warning:' "$BUILDLOG" | grep -F "$(pwd)/" | sort -u || true)"
+          if [ -n "$WARNINGS" ]; then
+            printf '%s\n' "$WARNINGS"
+            echo "::error::compiler warning(s) in our sources — the gate requires 0"
+            exit 1
+          fi
+          echo "compiler warnings (our sources): 0"

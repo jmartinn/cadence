@@ -63,3 +63,18 @@ jobs:
           test "$("$TOOLS/bin/swiftformat" --version)" = "0.61.1" \
             || { echo "::error::swiftformat version mismatch (want 0.61.1, got $("$TOOLS/bin/swiftformat" --version))"; exit 1; }
           echo "swiftlint 0.63.3 + swiftformat 0.61.1 ready"
+
+      - name: Stage 1 — swiftformat --lint
+        run: |
+          set -euo pipefail
+          swiftformat Cadence CadenceTests CadenceUITests --lint
+
+      - name: Stage 2 — swiftlint
+        run: |
+          set -euo pipefail
+          LINTLOG="$RUNNER_TEMP/swiftlint.log"
+          swiftlint lint --quiet | tee "$LINTLOG" || true
+          ERRORS="$(grep -c 'error:' "$LINTLOG" || true)"
+          WARNINGS="$(grep -c 'warning:' "$LINTLOG" || true)"
+          echo "lint: ${ERRORS} error(s), ${WARNINGS} warning(s) (warnings advisory)"
+          test "$ERRORS" -eq 0 || { echo "::error::swiftlint reported $ERRORS error(s)"; exit 1; }

@@ -59,7 +59,7 @@ jobs:
       - name: Stage 1 — swiftformat --lint
         run: |
           set -euo pipefail
-          swiftformat Cadence CadenceTests CadenceUITests --lint
+          swiftformat Cadence CadenceTests CadenceUITests CadenceKit --lint
 
       - name: Stage 2 — swiftlint
         run: |

@@ -7,6 +7,7 @@ enum MonthCalendar {
     struct Marker: Equatable {
         let serviceName: String   // → monogram
         let hasCard: Bool         // paymentBrand & paymentLast4 both set → blue debit badge
+        let subscription: Subscription   // originating model, for tap-to-detail
     }
 
     struct Day: Identifiable, Equatable {
@@ -46,7 +47,7 @@ enum MonthCalendar {
             for charge in schedule.occurrences(in: monthInterval) where charge < monthInterval.end {
                 let key = calendar.startOfDay(for: charge)
                 let hasCard = sub.paymentBrand != nil && sub.paymentLast4 != nil
-                markersByDay[key, default: []].append(Marker(serviceName: sub.name, hasCard: hasCard))
+                markersByDay[key, default: []].append(Marker(serviceName: sub.name, hasCard: hasCard, subscription: sub))
             }
         }
 

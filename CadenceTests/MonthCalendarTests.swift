@@ -37,11 +37,27 @@ struct MonthCalendarTests {
     }
 
     @Test func chargeAttachesMarkerWithCardFlag() {
+        let netflix = sub("Netflix", day: 4, card: true)
         let weeks = MonthCalendar.weeks(for: date(2025, 12, 1),
-                                        subscriptions: [sub("Netflix", day: 4, card: true)],
+                                        subscriptions: [netflix],
                                         today: date(2025, 12, 11), calendar: utc)
         let dec4 = days(weeks).first { $0.isInMonth && utc.component(.day, from: $0.date) == 4 }
-        #expect(dec4?.markers == [MonthCalendar.Marker(serviceName: "Netflix", hasCard: true)])
+        let marker = try! #require(dec4?.markers.first)
+        #expect(marker.serviceName == "Netflix")
+        #expect(marker.hasCard == true)
+        #expect(marker.subscription === netflix)   // identity carried through
+    }
+
+    @Test func eachChargeCarriesItsOwnSubscription() {
+        let a = sub("A", day: 8)
+        let b = sub("B", day: 8)
+        let weeks = MonthCalendar.weeks(for: date(2025, 12, 1),
+                                        subscriptions: [a, b],
+                                        today: date(2025, 12, 11), calendar: utc)
+        let dec8 = days(weeks).first { $0.isInMonth && utc.component(.day, from: $0.date) == 8 }
+        #expect(dec8?.markers.map(\.subscription).count == 2)
+        #expect(dec8?.markers.contains(where: { $0.subscription === a }) == true)
+        #expect(dec8?.markers.contains(where: { $0.subscription === b }) == true)
     }
 
     @Test func noCardMeansNoBadge() {

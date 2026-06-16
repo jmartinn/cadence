@@ -6,6 +6,8 @@ import SwiftUI
 struct MonthCalendarView: View {
     let weeks: [MonthCalendar.Week]
     var calendar: Calendar = .current
+    var onTapDay: (MonthCalendar.Day) -> Void = { _ in }
+    var onTapAdd: () -> Void = {}
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: Space.xs), count: 7)
     private static let weekdays = ["M", "T", "W", "T", "F", "S", "S"]
@@ -25,7 +27,8 @@ struct MonthCalendarView: View {
             LazyVGrid(columns: columns, spacing: Space.sm) {
                 ForEach(flatDays) { day in
                     CalendarDayCell(day: day, calendar: calendar,
-                                    showsAddAffordance: day.id == firstTrailingPaddingID)
+                                    showsAddAffordance: day.id == firstTrailingPaddingID,
+                                    onTapDay: onTapDay, onTapAdd: onTapAdd)
                 }
             }
         }
@@ -38,13 +41,25 @@ struct CalendarDayCell: View {
     let day: MonthCalendar.Day
     let calendar: Calendar
     var showsAddAffordance: Bool = false
+    var onTapDay: (MonthCalendar.Day) -> Void = { _ in }
+    var onTapAdd: () -> Void = {}
+
+    private static let a11yDateFormatter: DateFormatter = {
+        let f = DateFormatter(); f.setLocalizedDateFormatFromTemplate("MMMMd"); return f
+    }()
 
     private var number: String {
         day.isInMonth ? "\(calendar.component(.day, from: day.date))" : ""
     }
 
+    private var chargeAccessibilityLabel: String {
+        let when = Self.a11yDateFormatter.string(from: day.date)
+        let names = day.markers.map(\.serviceName)
+        return names.count == 1 ? "\(names[0]), \(when)" : "\(names.count) charges, \(when)"
+    }
+
     var body: some View {
-        ZStack(alignment: .topTrailing) {
+        let cell = ZStack(alignment: .topTrailing) {
             background
             content
             if day.isToday { dot.padding(6) }
@@ -52,6 +67,19 @@ struct CalendarDayCell: View {
         }
         .frame(height: 56)
         .frame(maxWidth: .infinity)
+        .contentShape(Rectangle())
+
+        if showsAddAffordance {
+            Button(action: onTapAdd) { cell }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Add subscription")
+        } else if !day.markers.isEmpty {
+            Button { onTapDay(day) } label: { cell }
+                .buttonStyle(.plain)
+                .accessibilityLabel(chargeAccessibilityLabel)
+        } else {
+            cell
+        }
     }
 
     @ViewBuilder private var background: some View {

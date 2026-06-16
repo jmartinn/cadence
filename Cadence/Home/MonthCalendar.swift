@@ -8,6 +8,7 @@ enum MonthCalendar {
         let serviceName: String   // → monogram
         let hasCard: Bool         // paymentBrand & paymentLast4 both set → blue debit badge
     }
+
     struct Day: Identifiable, Equatable {
         let date: Date            // start of day
         let isInMonth: Bool       // false for leading/trailing padding cells
@@ -15,6 +16,7 @@ enum MonthCalendar {
         let markers: [Marker]
         var id: Date { date }
     }
+
     struct Week: Identifiable, Equatable {
         let days: [Day]           // exactly 7, Monday-first
         var id: Date { days.first?.date ?? .distantPast }

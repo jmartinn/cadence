@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 /// The Subscriptions tab — Cadence's first real screen. Reads subscriptions reactively via
 /// `@Query`, derives display order with `SubscriptionListPresenter`, and totals with `Forecaster`.
@@ -45,11 +45,11 @@ struct SubscriptionsView: View {
             }
             #if DEBUG
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button { seedSampleData() } label: { Image(systemName: "ladybug") }
-                        .accessibilityLabel("Seed sample data")
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button { seedSampleData() } label: { Image(systemName: "ladybug") }
+                            .accessibilityLabel("Seed sample data")
+                    }
                 }
-            }
             #endif
         }
     }

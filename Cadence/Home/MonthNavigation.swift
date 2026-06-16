@@ -4,7 +4,6 @@ import Foundation
 /// The floor is always the calendar month that contains `today`; the UI
 /// never allows browsing to a month earlier than that.
 enum MonthNavigation {
-
     /// Returns the first instant (00:00:00) of the calendar month that
     /// contains `date`, according to the supplied `calendar`.
     static func startOfMonth(for date: Date, calendar: Calendar) -> Date {

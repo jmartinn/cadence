@@ -1,0 +1,30 @@
+# SwiftLint configuration for Cadence.
+#
+# Philosophy: flag genuine issues, not deliberate style. Pure-formatting concerns
+# are owned by SwiftFormat (see .swiftformat); rules below are tuned so the gate
+# stays green on the codebase's intentional compact style.
+
+included:
+  - Cadence
+  - CadenceTests
+  - CadenceUITests
+
+disabled_rules:
+  - trailing_comma # owned by SwiftFormat
+  - force_try # idiomatic in tests for fixtures; build+test is the real net
+  - comma # deliberate column alignment is preserved on purpose
+  - implicit_optional_initialization # stylistic; conflicts with the locked Domain layer's `= nil`
+  - static_over_final_class # false positive on `override class var` (can't be static)
+
+# Short local names (y, m, d, c, s) are deliberate in the date/money helpers.
+identifier_name:
+  min_length:
+    warning: 1
+    error: 0
+
+# The codebase writes long lines deliberately; keep only an outer guardrail.
+line_length:
+  warning: 200
+  error: 250
+  ignores_comments: true
+  ignores_urls: true

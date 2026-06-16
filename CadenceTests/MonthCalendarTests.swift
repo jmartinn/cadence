@@ -1,19 +1,22 @@
-import Testing
-import Foundation
 @testable import Cadence
+import Foundation
+import Testing
 
 struct MonthCalendarTests {
     private var utc: Calendar {
         var c = Calendar(identifier: .gregorian); c.timeZone = TimeZone(identifier: "UTC")!; return c
     }
+
     private func date(_ y: Int, _ m: Int, _ d: Int) -> Date {
         utc.date(from: DateComponents(year: y, month: m, day: d))!
     }
+
     private func sub(_ name: String, day: Int, status: SubscriptionStatus = .active, card: Bool = false) -> Subscription {
         Subscription(name: name, amount: 9, billingCycle: .monthly, anchorDate: date(2025, 12, day),
                      status: status, category: "T",
                      paymentBrand: card ? "Visa" : nil, paymentLast4: card ? "4821" : nil)
     }
+
     private func days(_ weeks: [MonthCalendar.Week]) -> [MonthCalendar.Day] { weeks.flatMap(\.days) }
 
     @Test func gridIsMondayFirstAndStartsOnDec1() {

@@ -1,11 +1,10 @@
-import Testing
-import Foundation
 @testable import Cadence
+import Foundation
+import Testing
 
 /// Locks `PriceText`'s money formatting — in particular the sign handling that the negative
 /// month-end forecast relies on (previously fixed only in the view, untested).
 struct PriceTextTests {
-
     @Test func splitFormatsWholeAndCents() {
         #expect(PriceText.split(Decimal(string: "90.94")!) == ("90", "94"))
         #expect(PriceText.split(Decimal(string: "1091.2")!) == ("1091", "20")) // pads to 2 digits

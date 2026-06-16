@@ -30,9 +30,9 @@ enum CadenceSchemaV1: VersionedSchema {
         var anchorDate: Date = Date.distantPast
         var status: SubscriptionStatus = SubscriptionStatus.active
         var category: String = ""
-        var serviceKey: String? = nil   // optional => CloudKit-legal; NEVER @Attribute(.unique)
-        var paymentBrand: String? = nil  // display-only, e.g. "Visa"; never enters the forecast
-        var paymentLast4: String? = nil  // display-only, e.g. "4821"
+        var serviceKey: String?   // optional => CloudKit-legal; NEVER @Attribute(.unique)
+        var paymentBrand: String?  // display-only, e.g. "Visa"; never enters the forecast
+        var paymentLast4: String?  // display-only, e.g. "4821"
 
         init(
             name: String,

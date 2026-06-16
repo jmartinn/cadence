@@ -1,6 +1,6 @@
-import Testing
-import Foundation
 @testable import Cadence
+import Foundation
+import Testing
 
 struct RecentChargesTests {
     /// Fixed UTC gregorian calendar so dates are deterministic regardless of machine TZ.

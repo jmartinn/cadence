@@ -26,10 +26,10 @@ struct AnchorDraft: Equatable {
 
     /// Seed from an existing anchor (edit).
     init(from anchor: BalanceAnchor) {
-        self.balance = Self.amountString(anchor.balance)
-        self.asOfDate = anchor.asOfDate
-        self.monthlyIncome = anchor.monthlyIncome > 0 ? Self.amountString(anchor.monthlyIncome) : ""
-        self.payday = anchor.incomePayday == .distantPast ? anchor.asOfDate : anchor.incomePayday
+        balance = Self.amountString(anchor.balance)
+        asOfDate = anchor.asOfDate
+        monthlyIncome = anchor.monthlyIncome > 0 ? Self.amountString(anchor.monthlyIncome) : ""
+        payday = anchor.incomePayday == .distantPast ? anchor.asOfDate : anchor.incomePayday
     }
 
     var parsedBalance: Decimal? {

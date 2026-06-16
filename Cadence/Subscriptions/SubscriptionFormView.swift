@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 /// Shared Add/Edit sheet. `mode` decides title + save behavior; all editable state lives in a
 /// single `SubscriptionDraft`. Save is disabled until the draft validates. Edit mode also offers
@@ -26,7 +26,7 @@ struct SubscriptionFormView: View {
         switch mode {
         case .add:
             _draft = State(initialValue: .empty(now: .now))
-        case .edit(let sub):
+        case let .edit(sub):
             _draft = State(initialValue: SubscriptionDraft(from: sub))
         }
     }
@@ -95,7 +95,7 @@ struct SubscriptionFormView: View {
                                    anchorDate: .distantPast, category: "")
             draft.apply(to: sub)
             modelContext.insert(sub)
-        case .edit(let sub):
+        case let .edit(sub):
             draft.apply(to: sub)
         }
         persist()
@@ -103,7 +103,7 @@ struct SubscriptionFormView: View {
     }
 
     private func deleteIfEditing() {
-        guard case .edit(let sub) = mode else {
+        guard case let .edit(sub) = mode else {
             dismiss()
             return
         }

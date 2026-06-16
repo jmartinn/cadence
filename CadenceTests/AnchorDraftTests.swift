@@ -1,7 +1,7 @@
-import Testing
+@testable import Cadence
 import Foundation
 import SwiftData
-@testable import Cadence
+import Testing
 
 struct AnchorDraftTests {
     private let day0 = Date(timeIntervalSince1970: 0)

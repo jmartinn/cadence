@@ -1,7 +1,7 @@
+@testable import Cadence
 import Foundation
 import SwiftData
 import Testing
-@testable import Cadence
 
 struct SubscriptionCRUDTests {
     let container = CadenceStore.inMemory()
@@ -13,6 +13,7 @@ struct SubscriptionCRUDTests {
         c.timeZone = TimeZone(identifier: "UTC")!
         return c
     }
+
     private func day(_ y: Int, _ m: Int, _ d: Int) -> Date {
         utc.date(from: DateComponents(year: y, month: m, day: d, hour: 12))!
     }

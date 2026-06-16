@@ -37,13 +37,13 @@ struct SubscriptionDraft: Sendable, Equatable {
 
     /// Seed for Edit mode.
     init(from sub: Subscription) {
-        self.name = sub.name
-        self.amount = Self.amountString(sub.amount)
-        self.billingCycle = sub.billingCycle
-        self.anchorDate = sub.anchorDate
-        self.category = sub.category
-        self.paymentBrand = sub.paymentBrand ?? ""
-        self.paymentLast4 = sub.paymentLast4 ?? ""
+        name = sub.name
+        amount = Self.amountString(sub.amount)
+        billingCycle = sub.billingCycle
+        anchorDate = sub.anchorDate
+        category = sub.category
+        paymentBrand = sub.paymentBrand ?? ""
+        paymentLast4 = sub.paymentLast4 ?? ""
     }
 
     /// Parses `amount` using the device locale's decimal separator ("," in es, "." in en).

@@ -1,9 +1,8 @@
-import Testing
-import Foundation
 @testable import Cadence
+import Foundation
+import Testing
 
 struct BillingScheduleTests {
-
     // MARK: - Deterministic date helpers
 
     /// Fixed UTC Gregorian calendar so tests don't depend on the machine's timezone.

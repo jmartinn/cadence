@@ -26,10 +26,10 @@ struct RootTabView: View {
 }
 
 #if DEBUG
-    #Preview {
-        let container = CadenceStore.inMemory()
-        SampleSubscriptions.seed(into: container.mainContext)
-        return RootTabView()
-            .modelContainer(container)
-    }
+#Preview {
+    let container = CadenceStore.inMemory()
+    SampleSubscriptions.seed(into: container.mainContext)
+    return RootTabView()
+        .modelContainer(container)
+}
 #endif

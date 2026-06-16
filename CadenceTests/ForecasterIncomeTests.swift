@@ -1,6 +1,6 @@
-import Testing
-import Foundation
 @testable import Cadence
+import Foundation
+import Testing
 
 struct ForecasterIncomeTests {
     let utc: Calendar = {
@@ -8,9 +8,11 @@ struct ForecasterIncomeTests {
         cal.timeZone = TimeZone(identifier: "UTC")!
         return cal
     }()
+
     func day(_ y: Int, _ m: Int, _ d: Int) -> Date {
         utc.date(from: DateComponents(year: y, month: m, day: d, hour: 12))!
     }
+
     func dec(_ s: String) -> Decimal { Decimal(string: s)! }
 
     func forecaster(balance: String, asOf: Date, income: String, payday: Date?,

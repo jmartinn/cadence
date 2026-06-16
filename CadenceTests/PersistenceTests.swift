@@ -1,13 +1,13 @@
+@testable import Cadence
 import Foundation
 import SwiftData
 import Testing
-@testable import Cadence
 
 /// Round-trip tests for the SwiftData models through a hermetic in-memory store.
 /// A fresh container per test (new struct instance per `@Test`) keeps tests isolated.
 struct PersistenceTests {
-    // Held as a stored property so the container outlives each test method
-    // (a ModelContext alone is not enough to keep the store alive).
+    /// Held as a stored property so the container outlives each test method
+    /// (a ModelContext alone is not enough to keep the store alive).
     let container = CadenceStore.inMemory()
 
     @Test func subscriptionRoundTripsAllFields() throws {

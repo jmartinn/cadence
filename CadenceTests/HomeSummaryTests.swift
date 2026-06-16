@@ -1,14 +1,16 @@
-import Testing
-import Foundation
 @testable import Cadence
+import Foundation
+import Testing
 
 struct HomeSummaryTests {
     private var utc: Calendar {
         var c = Calendar(identifier: .gregorian); c.timeZone = TimeZone(identifier: "UTC")!; return c
     }
+
     private func date(_ y: Int, _ m: Int, _ d: Int) -> Date {
         utc.date(from: DateComponents(year: y, month: m, day: d))!
     }
+
     private func sub(_ name: String, _ amount: String, day: Int,
                      status: SubscriptionStatus = .active, card: Bool = false) -> Subscription {
         Subscription(name: name, amount: Decimal(string: amount)!, billingCycle: .monthly,

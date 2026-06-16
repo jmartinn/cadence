@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 /// Sheet to set the balance anchor + recurring income. Driven by `AnchorDraft`; Save disabled
 /// until the draft validates. The payday field appears only once income is entered. MV: no view-model.

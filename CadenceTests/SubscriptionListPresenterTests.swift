@@ -1,7 +1,7 @@
-import Foundation
-import Testing
-import SwiftData
 @testable import Cadence
+import Foundation
+import SwiftData
+import Testing
 
 struct SubscriptionListPresenterTests {
     let container: ModelContainer

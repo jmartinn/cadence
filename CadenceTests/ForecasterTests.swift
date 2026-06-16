@@ -1,9 +1,8 @@
-import Testing
-import Foundation
 @testable import Cadence
+import Foundation
+import Testing
 
 struct ForecasterTests {
-
     // MARK: - Deterministic helpers
 
     let utc: Calendar = {

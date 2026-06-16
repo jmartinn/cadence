@@ -1,6 +1,6 @@
-import Testing
-import Foundation
 @testable import Cadence
+import Foundation
+import Testing
 
 struct SubscriptionDraftTests {
     private func baseDraft() -> SubscriptionDraft {

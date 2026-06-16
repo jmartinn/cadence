@@ -19,7 +19,13 @@ Architecture in place (Slices 1–4 done): a pure value-type domain layer in `Ca
 ```bash
 ./scripts/verify.sh
 ```
-Builds + tests in Debug on the connected physical iPhone (no simulator) and FAILS on any build error, test failure, or compiler warning in our own sources. `scripts/` is git-excluded (local-only). This is the required gate before considering work done.
+A three-stage gate, run in order, before considering work done:
+
+1. **`swiftformat --lint`** (config `.swiftformat`) — FAILS if any source is unformatted; fix with `swiftformat Cadence CadenceTests CadenceUITests`.
+2. **`swiftlint`** (config `.swiftlint.yml`) — FAILS on lint **errors**; warnings are reported but **non-blocking** (they surface genuine smells without blocking on the codebase's deliberate compact style).
+3. **`xcodebuild`** build + test in Debug on the connected physical iPhone (no simulator) — FAILS on any build error, test failure, or compiler **warning in our own sources**.
+
+`.swiftformat` and `.swiftlint.yml` are committed (and tuned to leave the locked `Cadence/Domain/**` untouched); `scripts/` is git-excluded (local-only). This is the required gate before considering work done.
 
 **Dev workflow is device-first** — the app is built/run on a physical iPhone, not the simulator. Manual `xcodebuild` against a device:
 ```bash

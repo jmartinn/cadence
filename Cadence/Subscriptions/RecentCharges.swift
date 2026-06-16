@@ -12,7 +12,7 @@ enum RecentCharges {
         let date: Date
         let amount: Decimal
         init(date: Date, amount: Decimal) {
-            self.id = date
+            id = date
             self.date = date
             self.amount = amount
         }

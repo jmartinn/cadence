@@ -1,7 +1,7 @@
+@testable import Cadence
 import Foundation
 import SwiftData
 import Testing
-@testable import Cadence
 
 /// Proves the one-directional `@Model -> value type` bridge maps every forecast-relevant field.
 struct SubscriptionBridgeTests {

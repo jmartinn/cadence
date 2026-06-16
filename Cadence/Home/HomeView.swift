@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 /// The Home tab: forecast dashboard for the displayed month. MV — derivation lives in `HomeSummary`
 /// and `MonthCalendar`; the view only composes. Reads subscriptions and the anchor via `@Query`.
@@ -28,10 +28,12 @@ struct HomeView: View {
         HomeSummary.make(subscriptions: subscriptions, anchor: anchor,
                          referenceDate: displayedMonth, today: today, calendar: calendar)
     }
+
     private var weeks: [MonthCalendar.Week] {
         MonthCalendar.weeks(for: displayedMonth, subscriptions: subscriptions,
                             today: today, calendar: calendar)
     }
+
     private var renewing: [HomeSummary.RenewingItem] {
         HomeSummary.renewing(subscriptions: subscriptions,
                              referenceDate: displayedMonth, calendar: calendar)

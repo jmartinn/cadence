@@ -19,7 +19,7 @@ struct PriceText: View {
 
     let amount: Decimal
     var symbolPosition: SymbolPosition = .leading
-    var suffix: String? = nil
+    var suffix: String?
     var wholeSize: CGFloat = 22
     var symbolSize: CGFloat = 14
     var centsSize: CGFloat = 12

@@ -1,11 +1,12 @@
-import Testing
-import Foundation
 @testable import Cadence
+import Foundation
+import Testing
 
 struct MonthNavigationTests {
     private var utc: Calendar {
         var c = Calendar(identifier: .gregorian); c.timeZone = TimeZone(identifier: "UTC")!; return c
     }
+
     private func date(_ y: Int, _ m: Int, _ d: Int) -> Date {
         utc.date(from: DateComponents(year: y, month: m, day: d))!
     }

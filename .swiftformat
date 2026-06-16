@@ -1,0 +1,40 @@
+# SwiftFormat configuration for Cadence.
+#
+# Goal: normalize the mechanical stuff (indentation, import order, blank-line
+# hygiene) WITHOUT fighting the codebase's deliberate compact/aligned style.
+# Rules below are disabled because they churn intentional formatting:
+#
+#   consecutiveSpaces    — would collapse intentional column alignment
+#   wrapPropertyBodies   — keeps single-line computed properties on one line
+#   wrapFunctionBodies   — keeps single-line helper funcs on one line
+#   semicolons           — keeps compact ;-chained one-liners (esp. test helpers)
+#   hoistTry             — leaves `try` placement as written (minimize churn)
+#   noForceUnwrapInTests — tests force-unwrap fixtures by design
+#   noForceTryInTests    — tests force-try fixtures by design
+#   redundantSendable    — keep explicit `: Sendable` (documented intent on value types)
+#   numberFormatting     — keep intentional digit grouping (e.g. 10_000)
+
+--swiftversion 5.0
+
+# Keep #if DEBUG / #Preview blocks flush (the existing convention) rather than
+# indenting their bodies a level.
+--ifdef no-indent
+
+# Keep ranges tight (0..<n), not spaced (0 ..< n) — matches the domain layer.
+--ranges no-space
+
+# Keep the opening brace inline after a wrapped signature (`) -> T {`) rather than
+# on its own line — matches SwiftLint's opening_brace rule and the house style.
+--disable wrapMultilineStatementBraces
+
+--disable consecutiveSpaces
+--disable wrapPropertyBodies
+--disable wrapFunctionBodies
+--disable semicolons
+--disable hoistTry
+--disable noForceUnwrapInTests
+--disable noForceTryInTests
+--disable redundantSendable
+--disable numberFormatting
+
+--exclude .build,docs,scripts,.git

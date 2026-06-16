@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 /// Read-only detail for one subscription (the Figma detail frame) plus its lifecycle actions.
 /// `@Bindable` so status mutations and edits re-render live. MV: no view-model.
@@ -17,6 +17,7 @@ struct SubscriptionDetailView: View {
     private static let chargeDateFormatter: DateFormatter = {
         let f = DateFormatter(); f.setLocalizedDateFormatFromTemplate("MMMMd"); return f
     }()
+
     private static let nextChargeFormatter: DateFormatter = {
         let f = DateFormatter(); f.dateStyle = .medium; return f
     }()
@@ -118,7 +119,8 @@ struct SubscriptionDetailView: View {
         // Only an active subscription has a meaningful upcoming charge; paused/ended ones won't
         // bill, so a future date would mislead. (Recent charges stay — they're past history.)
         guard subscription.status == .active,
-              let next = SubscriptionListPresenter.nextCharge(for: subscription, after: today, calendar: calendar) else {
+              let next = SubscriptionListPresenter.nextCharge(for: subscription, after: today, calendar: calendar)
+        else {
             return "—"
         }
         return Self.nextChargeFormatter.string(from: next)
@@ -169,7 +171,7 @@ struct SubscriptionDetailView: View {
 
     // MARK: Actions
 
-    @ViewBuilder private var actions: some View {
+    private var actions: some View {
         VStack(spacing: Space.md) {
             switch subscription.status {
             case .active:

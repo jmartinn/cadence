@@ -11,6 +11,9 @@ struct HomeView: View {
     @Query(sort: \BalanceAnchor.asOfDate, order: .reverse) private var anchors: [BalanceAnchor]
     @State private var showingAnchorSheet = false
     @State private var displayedMonth: Date = MonthNavigation.startOfMonth(for: .now, calendar: .current)
+    @State private var path = NavigationPath()
+    @State private var disambiguating: MonthCalendar.Day?
+    @State private var showingAdd = false
 
     private var today: Date { .now }
     private var calendar: Calendar { .current }
@@ -23,6 +26,20 @@ struct HomeView: View {
     private static let monthFormatter: DateFormatter = {
         let f = DateFormatter(); f.dateFormat = "MMMM"; return f
     }()
+
+    private static let dayFormatter: DateFormatter = {
+        let f = DateFormatter(); f.setLocalizedDateFormatFromTemplate("MMMMd"); return f
+    }()
+
+    private var disambiguationTitle: String {
+        guard let day = disambiguating else { return "" }
+        return "Charges on \(Self.dayFormatter.string(from: day.date))"
+    }
+
+    private var isDisambiguating: Binding<Bool> {
+        Binding(get: { disambiguating != nil },
+                set: { presented in if !presented { disambiguating = nil } })
+    }
 
     private var summary: HomeSummary {
         HomeSummary.make(subscriptions: subscriptions, anchor: anchor,
@@ -40,7 +57,7 @@ struct HomeView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             ScrollView {
                 VStack(spacing: Space.xl) {
                     HomeMonthHeader(
@@ -65,7 +82,18 @@ struct HomeView: View {
                     }
                     ForecastLineView(projected: summary.projectedEndOfMonth) { showingAnchorSheet = true }
                         .padding(.horizontal, Space.md)
-                    MonthCalendarView(weeks: weeks, calendar: calendar)
+                    MonthCalendarView(
+                        weeks: weeks,
+                        calendar: calendar,
+                        onTapDay: { day in
+                            switch CalendarDayTap.outcome(for: day) {
+                            case .none: break
+                            case let .detail(sub): path.append(sub)
+                            case .disambiguate: disambiguating = day
+                            }
+                        },
+                        onTapAdd: { showingAdd = true }
+                    )
                     if !renewing.isEmpty {
                         RenewingSection(
                             title: isViewingCurrentMonth
@@ -81,6 +109,13 @@ struct HomeView: View {
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .navigationDestination(for: Subscription.self) { SubscriptionDetailView(subscription: $0) }
             .sheet(isPresented: $showingAnchorSheet) { AnchorEditSheet(anchor: anchor) }
+            .sheet(isPresented: $showingAdd) { SubscriptionFormView(mode: .add) }
+            .confirmationDialog(disambiguationTitle, isPresented: isDisambiguating,
+                                titleVisibility: .visible, presenting: disambiguating) { day in
+                ForEach(day.markers.map(\.subscription)) { sub in
+                    Button(sub.name) { path.append(sub) }
+                }
+            }
         }
     }
 }

@@ -39,4 +39,9 @@ struct ColorHexTests {
         #expect(Color(hex: "#FFFFFF")!.prefersDarkForeground == true) // light tile → dark letter
         #expect(Color(hex: "#000000")!.prefersDarkForeground == false) // dark tile → white letter
     }
+
+    @Test func foregroundContrastsForBrandColors() {
+        #expect(Color(hex: "#F9B500")!.prefersDarkForeground == true) // bright yellow → dark letter
+        #expect(Color(hex: "#E50914")!.prefersDarkForeground == false) // saturated red → white letter
+    }
 }

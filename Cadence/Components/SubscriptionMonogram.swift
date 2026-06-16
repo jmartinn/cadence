@@ -1,20 +1,25 @@
 import SwiftUI
 
-/// Circular monogram for a service: the name's first letter on a deterministic hashed hue.
-/// Shared by the list row (44pt) and the detail header (72pt). The hue hash is a non-money
-/// `Double`, which is fine — only currency must stay `Decimal`.
+/// Circular service avatar: brand color tile + the name's first letter when the service is known
+/// to `ServiceCatalog`, otherwise a deterministic hashed-hue tile. Shared by the list row (44pt),
+/// the detail header (72pt), the calendar marker (18pt), and the paid cluster (28pt). The hue hash
+/// is a non-money `Double`, which is fine — only currency must stay `Decimal`.
 struct SubscriptionMonogram: View {
+    var serviceKey: String?
     let name: String
     var size: CGFloat = 44
 
     var body: some View {
+        let brand = ServiceCatalog.brand(serviceKey: serviceKey, name: name)
+        let tile = brand?.color ?? Self.color(for: name)
+        let letter = brand?.color.contrastingForeground ?? .white
         Circle()
-            .fill(Self.color(for: name))
+            .fill(tile)
             .frame(width: size, height: size)
             .overlay(
                 Text(Self.initial(for: name))
                     .font(.system(size: size * 0.36, weight: .bold))
-                    .foregroundColor(.white)
+                    .foregroundColor(letter)
             )
     }
 
@@ -32,8 +37,9 @@ struct SubscriptionMonogram: View {
 
 #Preview {
     HStack(spacing: 16) {
-        SubscriptionMonogram(name: "Netflix")
-        SubscriptionMonogram(name: "Spotify", size: 72)
+        SubscriptionMonogram(name: "Netflix")                                     // brand red
+        SubscriptionMonogram(serviceKey: "spotify", name: "Spotify", size: 72)   // brand green
+        SubscriptionMonogram(name: "Unknown Service", size: 44)                   // hashed fallback
     }
     .padding()
 }

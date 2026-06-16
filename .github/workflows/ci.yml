@@ -78,3 +78,29 @@ jobs:
           WARNINGS="$(grep -c 'warning:' "$LINTLOG" || true)"
           echo "lint: ${ERRORS} error(s), ${WARNINGS} warning(s) (warnings advisory)"
           test "$ERRORS" -eq 0 || { echo "::error::swiftlint reported $ERRORS error(s)"; exit 1; }
+
+      - name: Stage 3 — build + test (simulator, 0 warnings)
+        run: |
+          set -euo pipefail
+          BUILDLOG="$RUNNER_TEMP/xcodebuild.log"
+          set +e
+          xcodebuild test \
+            -project Cadence.xcodeproj \
+            -scheme Cadence \
+            -configuration Debug \
+            -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' \
+            -skip-testing:CadenceUITests/CadenceUITests/testLaunchPerformance \
+            -resultBundlePath "$RUNNER_TEMP/Cadence.xcresult" \
+            2>&1 | tee "$BUILDLOG"
+          STATUS=${PIPESTATUS[0]}
+          set -e
+          test "$STATUS" -eq 0 || { echo "::error::xcodebuild test failed (exit $STATUS)"; exit "$STATUS"; }
+
+          WARNINGS="$(grep 'warning:' "$BUILDLOG" | grep "$(pwd)/" | sort -u || true)"
+          COUNT="$(printf '%s' "$WARNINGS" | grep -c . | tr -d ' ')"
+          echo "compiler warnings (our sources): $COUNT"
+          if [ "$COUNT" -gt 0 ]; then
+            printf '%s\n' "$WARNINGS"
+            echo "::error::$COUNT compiler warning(s) in our sources — the gate requires 0"
+            exit 1
+          fi

@@ -34,15 +34,6 @@ jobs:
           # resolve simulator destinations (idempotent — a no-op if already installed).
           xcodebuild -downloadPlatform iOS
 
-      - name: Diagnostics (temporary — removed once pins are finalized)
-        run: |
-          set -euo pipefail
-          echo "## Xcode"; xcodebuild -version
-          echo "## iOS SDKs"; xcodebuild -showsdks | grep -i ios || true
-          echo "## Simulator runtimes"; xcrun simctl list runtimes | grep -i ios || true
-          echo "## iPhone simulators"; xcrun simctl list devices available | grep -i iphone || true
-          echo "## eligible destinations"; xcodebuild -showdestinations -project Cadence.xcodeproj -scheme Cadence 2>&1 | grep -iE "platform:iOS Simulator|error" | head -30 || true
-
       - name: Install pinned swiftformat + swiftlint
         run: |
           set -euo pipefail
@@ -104,11 +95,13 @@ jobs:
           set -e
           test "$STATUS" -eq 0 || { echo "::error::xcodebuild test failed (exit $STATUS)"; exit "$STATUS"; }
 
-          WARNINGS="$(grep 'warning:' "$BUILDLOG" | grep "$(pwd)/" | sort -u || true)"
-          COUNT="$(printf '%s' "$WARNINGS" | grep -c . | tr -d ' ')"
-          echo "compiler warnings (our sources): $COUNT"
-          if [ "$COUNT" -gt 0 ]; then
+          # Compiler warnings under the repo path only (ignore SDK/Xcode noise). Avoid `grep -c`,
+          # which returns exit 1 on zero matches and would abort under `set -e` — the very
+          # 0-warning case the gate is meant to pass.
+          WARNINGS="$(grep 'warning:' "$BUILDLOG" | grep -F "$(pwd)/" | sort -u || true)"
+          if [ -n "$WARNINGS" ]; then
             printf '%s\n' "$WARNINGS"
-            echo "::error::$COUNT compiler warning(s) in our sources — the gate requires 0"
+            echo "::error::compiler warning(s) in our sources — the gate requires 0"
             exit 1
           fi
+          echo "compiler warnings (our sources): 0"

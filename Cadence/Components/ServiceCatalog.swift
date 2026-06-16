@@ -101,7 +101,9 @@ enum ServiceCatalog {
         var map: [String: ServiceBrand] = [:]
         for brand in all {
             map[normalize(brand.slug)] = brand
-            for alias in brand.aliases { map[normalize(alias)] = brand }
+            for alias in brand.aliases {
+                map[normalize(alias)] = brand
+            }
         }
         return map
     }()

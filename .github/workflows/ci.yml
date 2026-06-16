@@ -27,6 +27,13 @@ jobs:
         with:
           xcode-version: latest-stable
 
+      - name: Prepare iOS simulator platform
+        run: |
+          set -euo pipefail
+          # Register the iOS simulator platform with the selected Xcode so xcodebuild can
+          # resolve simulator destinations (idempotent — a no-op if already installed).
+          xcodebuild -downloadPlatform iOS
+
       - name: Diagnostics (temporary — removed once pins are finalized)
         run: |
           set -euo pipefail
@@ -34,6 +41,7 @@ jobs:
           echo "## iOS SDKs"; xcodebuild -showsdks | grep -i ios || true
           echo "## Simulator runtimes"; xcrun simctl list runtimes | grep -i ios || true
           echo "## iPhone simulators"; xcrun simctl list devices available | grep -i iphone || true
+          echo "## eligible destinations"; xcodebuild -showdestinations -project Cadence.xcodeproj -scheme Cadence 2>&1 | grep -iE "platform:iOS Simulator|error" | head -30 || true
 
       - name: Install pinned swiftformat + swiftlint
         run: |

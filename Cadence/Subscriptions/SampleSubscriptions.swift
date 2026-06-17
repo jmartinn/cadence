@@ -13,19 +13,22 @@ enum SampleSubscriptions {
     /// drives the June occurrence; most carry card details (calendar debit badge), Notion + NYT are
     /// deliberately card-less (monochrome brands → no badge).
     static func makeAll() -> [Subscription] {
-        [
-            // Paid this month (charge before today's 15th): 17.99 + 10.99 = 28.98
-            sub("Netflix", "17.99", .monthly, 2025, 1, 4, "netflix", "Entertainment", "Visa", "4821"),
-            sub("Disney+", "10.99", .monthly, 2025, 1, 10, "disney-plus", "Entertainment", "Visa", "4821"),
-            // Renewing later this month: 11.99 + 13.99 + 12.00 + 8.00 + 8.99 + 2.99 + 4.00 = 61.96
-            sub("NYT", "4.00", .monthly, 2025, 1, 16, "nyt", "News"),
-            sub("Figma", "12.00", .monthly, 2025, 1, 18, "figma", "Productivity", "Mastercard", "5512"),
-            sub("Spotify", "11.99", .monthly, 2025, 1, 20, "spotify", "Music", "Mastercard", "5512"),
-            sub("iCloud+", "2.99", .monthly, 2025, 1, 22, "icloud", "Utilities", "Visa", "4821"),
-            sub("Notion", "8.00", .monthly, 2025, 1, 25, "notion", "Productivity"),
-            sub("YouTube Premium", "13.99", .monthly, 2025, 1, 28, "youtube", "Entertainment", "Visa", "4821"),
-            sub("Amazon Prime", "8.99", .monthly, 2025, 1, 30, "amazon-prime", "Shopping", "Visa", "4821"),
-        ]
+        let netflix = sub("Netflix", "17.99", .monthly, 2025, 1, 4, "netflix", "Entertainment", "Visa", "4821")
+        let disney = sub("Disney+", "10.99", .monthly, 2025, 1, 10, "disney-plus", "Entertainment", "Visa", "4821")
+        let nyt = sub("NYT", "4.00", .monthly, 2025, 1, 16, "nyt", "News")
+        let figma = sub("Figma", "12.00", .monthly, 2025, 1, 18, "figma", "Productivity", "Mastercard", "5512")
+        let spotify = sub("Spotify", "11.99", .monthly, 2025, 1, 20, "spotify", "Music", "Mastercard", "5512")
+        let icloud = sub("iCloud+", "2.99", .monthly, 2025, 1, 22, "icloud", "Utilities", "Visa", "4821")
+        let notion = sub("Notion", "8.00", .monthly, 2025, 1, 25, "notion", "Productivity")
+        let youtube = sub("YouTube Premium", "13.99", .monthly, 2025, 1, 28, "youtube", "Entertainment", "Visa", "4821")
+        let prime = sub("Amazon Prime", "8.99", .monthly, 2025, 1, 30, "amazon-prime", "Shopping", "Visa", "4821")
+        // Two Amazon Channels billed through Prime, linked as display-only add-ons.
+        let paramount = sub("Paramount+", "7.99", .monthly, 2025, 1, 30, "paramount-plus", "Entertainment", "Visa", "4821")
+        let crunchyroll = sub("Crunchyroll", "4.99", .monthly, 2025, 1, 30, "crunchyroll", "Entertainment", "Visa", "4821")
+        paramount.parent = prime
+        crunchyroll.parent = prime
+        return [netflix, disney, nyt, figma, spotify, icloud, notion, youtube,
+                prime, paramount, crunchyroll]
     }
 
     /// Insert the samples and persist so they survive relaunch on device.

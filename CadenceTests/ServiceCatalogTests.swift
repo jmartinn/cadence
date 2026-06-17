@@ -85,10 +85,10 @@ struct ServiceCatalogTests {
     }
 
     @Test func uncoveredBrandsHaveNilIconAssetName() {
-        // No bundled App Store icon: icloud (no app), midjourney (no app), github-copilot (no
-        // distinct app), cursor (desktop app; iOS search returns the wrong app). Everything else
-        // resolves to a real icon.
-        let uncovered = ["icloud", "midjourney", "github-copilot", "cursor"]
+        // midjourney has no bundled logo: its theSVG mark is stroke-only and can't be rasterized
+        // without librsvg, so it stays a brand-color letter tile. icloud/cursor/github-copilot now
+        // carry bundled logos. Everything else resolves to a real icon.
+        let uncovered = ["midjourney"]
         for slug in uncovered {
             let brand = ServiceCatalog.brand(serviceKey: slug, name: "")
             #expect(brand?.iconAssetName == nil, "\(slug) has no bundled icon")

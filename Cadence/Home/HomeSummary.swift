@@ -2,6 +2,14 @@ import CadenceKit
 import Foundation
 import SwiftData
 
+/// A name + optional serviceKey pair for one icon slot in the paid-summary cluster.
+/// `serviceKey` carries the user's manually-picked brand override so `ServiceIcon` can
+/// resolve the correct logo even when the subscription name doesn't match catalog entries.
+struct ClusterIcon: Equatable {
+    let name: String
+    let serviceKey: String?
+}
+
 /// Derived facts for the Home dashboard header. Pure presentation logic (mirrors
 /// `SubscriptionListPresenter`): reads `@Model Subscription` for names but no SwiftUI, so it
 /// unit-tests with directly-constructed instances. Output is value-typed and `Equatable`.
@@ -10,8 +18,16 @@ struct HomeSummary: Equatable {
     let paid: Int
     let total: Int
     let paidAmount: Decimal
-    let clusterNames: [String]          // services renewing in referenceDate's month, charge-date order
+    let clusterIcons: [ClusterIcon]     // services renewing in referenceDate's month, charge-date order
     let projectedEndOfMonth: Decimal?   // nil when there is no anchor
+
+    /// Intermediate per-subscription data gathered while scanning the current month's charges.
+    private struct MonthEntry {
+        let name: String
+        let charge: Date
+        let amount: Decimal
+        let serviceKey: String?
+    }
 
     /// - Parameters:
     ///   - referenceDate: Drives the month interval, the this-month charge list, clusterNames,
@@ -40,12 +56,13 @@ struct HomeSummary: Equatable {
 
         // This-month charge per active sub (earliest occurrence in referenceDate's month).
         let month = calendar.dateInterval(of: .month, for: referenceDate)
-        var thisMonth: [(name: String, charge: Date, amount: Decimal)] = []
+        var thisMonth: [MonthEntry] = []
         if let month {
             for sub in active {
                 let schedule = BillingSchedule(anchorDate: sub.anchorDate, cycle: sub.billingCycle, calendar: calendar)
                 if let charge = schedule.occurrences(in: month).first(where: { $0 < month.end }) {
-                    thisMonth.append((sub.name, charge, sub.amount))
+                    thisMonth.append(MonthEntry(name: sub.name, charge: charge,
+                                                amount: sub.amount, serviceKey: sub.serviceKey))
                 }
             }
             thisMonth.sort { $0.charge < $1.charge }
@@ -66,7 +83,7 @@ struct HomeSummary: Equatable {
             paid: counts.paid,
             total: counts.total,
             paidAmount: paidAmount,
-            clusterNames: thisMonth.map(\.name),
+            clusterIcons: thisMonth.map { ClusterIcon(name: $0.name, serviceKey: $0.serviceKey) },
             projectedEndOfMonth: projected
         )
     }

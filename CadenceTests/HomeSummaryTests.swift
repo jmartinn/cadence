@@ -13,9 +13,11 @@ struct HomeSummaryTests {
     }
 
     private func sub(_ name: String, _ amount: String, day: Int,
-                     status: SubscriptionStatus = .active, card: Bool = false) -> Subscription {
+                     status: SubscriptionStatus = .active, card: Bool = false,
+                     serviceKey: String? = nil) -> Subscription {
         Subscription(name: name, amount: Decimal(string: amount)!, billingCycle: .monthly,
                      anchorDate: date(2025, 12, day), status: status, category: "Test",
+                     serviceKey: serviceKey,
                      paymentBrand: card ? "Visa" : nil, paymentLast4: card ? "4821" : nil)
     }
 
@@ -32,7 +34,7 @@ struct HomeSummaryTests {
     @Test func clusterNamesAreOrderedByChargeDate() {
         let subs = [sub("Figma", "15.00", day: 12), sub("Netflix", "17.99", day: 4), sub("Spotify", "10.99", day: 8)]
         let s = HomeSummary.make(subscriptions: subs, anchor: nil, referenceDate: date(2025, 12, 11), calendar: utc)
-        #expect(s.clusterNames == ["Netflix", "Spotify", "Figma"])
+        #expect(s.clusterIcons.map(\.name) == ["Netflix", "Spotify", "Figma"])
     }
 
     @Test func projectedIsNilWithoutAnchor() {
@@ -56,7 +58,7 @@ struct HomeSummaryTests {
                     sub("C", "30.00", day: 6, status: .ended)]
         let s = HomeSummary.make(subscriptions: subs, anchor: nil, referenceDate: date(2025, 12, 11), calendar: utc)
         #expect(s.total == 1)
-        #expect(s.clusterNames == ["A"])
+        #expect(s.clusterIcons.map(\.name) == ["A"])
     }
 
     @Test func renewingIsThisMonthSortedByChargeDate() {
@@ -109,7 +111,24 @@ struct HomeSummaryTests {
                                  referenceDate: date(2026, 2, 15),
                                  today: date(2026, 1, 15),
                                  calendar: utc)
-        #expect(s.clusterNames == ["AnnualFeb", "Netflix"])
+        #expect(s.clusterIcons.map(\.name) == ["AnnualFeb", "Netflix"])
+    }
+
+    /// clusterIcons carries the serviceKey override so manually-picked logos render correctly.
+    /// "My Spotify" won't auto-resolve to the spotify brand by name alone — the override is
+    /// what exercises the path. Before the fix, only name was stored and serviceKey was lost.
+    @Test func clusterIconCarriesServiceKeyOverride() {
+        let subs = [
+            sub("My Spotify", "9.99", day: 4, serviceKey: "spotify"),
+            sub("Netflix", "17.99", day: 10),
+        ]
+        let s = HomeSummary.make(subscriptions: subs, anchor: nil,
+                                 referenceDate: date(2025, 12, 11), calendar: utc)
+        #expect(s.clusterIcons.count == 2)
+        #expect(s.clusterIcons[0].name == "My Spotify")
+        #expect(s.clusterIcons[0].serviceKey == "spotify")
+        #expect(s.clusterIcons[1].name == "Netflix")
+        #expect(s.clusterIcons[1].serviceKey == nil)
     }
 
     /// renewing(referenceDate:) returns subscriptions with a charge in referenceDate's month.

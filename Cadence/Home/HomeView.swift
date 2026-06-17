@@ -75,7 +75,7 @@ struct HomeView: View {
                     SpendingHeadline(monthlyTotal: summary.monthlyTotal)
                     if isViewingCurrentMonth {
                         PaidSummaryView(paid: summary.paid, total: summary.total,
-                                        paidAmount: summary.paidAmount, clusterNames: summary.clusterNames)
+                                        paidAmount: summary.paidAmount, clusterIcons: summary.clusterIcons)
                             .font(.system(size: 15))
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, Space.md)

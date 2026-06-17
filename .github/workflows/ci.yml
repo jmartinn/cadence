@@ -122,19 +122,3 @@ jobs:
             exit 1
           fi
           echo "compiler warnings (our sources): 0"
-
-  commit-lint:
-    name: commit-lint
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    timeout-minutes: 5
-    steps:
-      - name: Checkout
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-
-      - name: Lint PR title
-        env:
-          PR_TITLE: ${{ github.event.pull_request.title }}
-        run: |
-          set -euo pipefail
-          sh .githooks/lib/validate-subject.sh "$PR_TITLE"

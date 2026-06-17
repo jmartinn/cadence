@@ -47,7 +47,7 @@ struct SubscriptionAddOnLogicTests {
         let netflix = make("Netflix", "17.99")
         [prime, netflix].forEach(ctx.insert)
 
-        var draft = SubscriptionDraft(from: netflix)
+        let draft = SubscriptionDraft(from: netflix)
         draft.apply(to: netflix, parent: prime)
         #expect(netflix.parent === prime)
 

@@ -8,10 +8,12 @@ import SwiftData
 enum SampleSubscriptions {
     /// Fresh `Subscription` instances every call (never reuse `@Model` objects across contexts).
     ///
-    /// Tuned to the Home Figma frame: 9 monthly subs totaling **€90.94/m**, of which the two that
-    /// charge before mid-month (day 4 + 10) total **€28.98** → "paid 2/9 or €28,98". Day-of-month
-    /// drives the June occurrence; most carry card details (calendar debit badge), Notion + NYT are
-    /// deliberately card-less (monochrome brands → no badge).
+    /// 11 monthly subs: the original 9 (Netflix, Disney+, NYT, Figma, Spotify, iCloud+, Notion,
+    /// YouTube Premium, Amazon Prime) plus two add-ons billed through Amazon Prime — Paramount+
+    /// (€7.99) and Crunchyroll (€4.99) — linked via `.parent = prime`. Add-ons are display-only
+    /// children of Prime in the UI but still count independently toward the forecast total.
+    /// Day-of-month drives the occurrence; most carry card details (calendar debit badge), Notion
+    /// + NYT are deliberately card-less (monochrome brands → no badge).
     static func makeAll() -> [Subscription] {
         let netflix = sub("Netflix", "17.99", .monthly, 2025, 1, 4, "netflix", "Entertainment", "Visa", "4821")
         let disney = sub("Disney+", "10.99", .monthly, 2025, 1, 10, "disney-plus", "Entertainment", "Visa", "4821")

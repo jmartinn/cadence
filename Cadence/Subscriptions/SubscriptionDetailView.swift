@@ -157,10 +157,11 @@ struct SubscriptionDetailView: View {
 
     @ViewBuilder private var addOnsSection: some View {
         if !subscription.addOns.isEmpty {
+            let addOns = sortedAddOns
             VStack(alignment: .leading, spacing: Space.md) {
                 Text("Add-ons").font(.system(size: 18, weight: .bold))
                 VStack(spacing: 0) {
-                    ForEach(sortedAddOns) { addOn in
+                    ForEach(addOns) { addOn in
                         NavigationLink(value: addOn) {
                             HStack(spacing: Space.md) {
                                 ServiceIcon(serviceKey: addOn.serviceKey, name: addOn.name)
@@ -178,7 +179,7 @@ struct SubscriptionDetailView: View {
                             .padding(Space.lg)
                         }
                         .buttonStyle(.plain)
-                        if addOn.persistentModelID != sortedAddOns.last?.persistentModelID {
+                        if addOn.persistentModelID != addOns.last?.persistentModelID {
                             Divider().padding(.leading, Space.lg)
                         }
                     }

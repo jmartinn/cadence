@@ -1,0 +1,9 @@
+{
+  "images" : [
+    {
+      "filename" : "apple-tv-plus.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : { "author" : "xcode", "version" : 1 }
+}

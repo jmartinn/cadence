@@ -30,7 +30,7 @@ struct HomeSummary: Equatable {
     }
 
     /// - Parameters:
-    ///   - referenceDate: Drives the month interval, the this-month charge list, clusterNames,
+    ///   - referenceDate: Drives the month interval, the this-month charge list, clusterIcons,
     ///     and the projection target (last instant of referenceDate's month).
     ///   - today: Drives now-sensitive values only: `paidThisMonth(asOf:)` and `paidAmount`
     ///     (charges with date <= now). Defaults to `referenceDate` so current-month callers

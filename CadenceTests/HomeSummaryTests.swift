@@ -31,7 +31,7 @@ struct HomeSummaryTests {
         #expect(s.paidAmount == Decimal(string: "17.99")!)   // only Dec 4 ≤ Dec 11
     }
 
-    @Test func clusterNamesAreOrderedByChargeDate() {
+    @Test func clusterIconsAreOrderedByChargeDate() {
         let subs = [sub("Figma", "15.00", day: 12), sub("Netflix", "17.99", day: 4), sub("Spotify", "10.99", day: 8)]
         let s = HomeSummary.make(subscriptions: subs, anchor: nil, referenceDate: date(2025, 12, 11), calendar: utc)
         #expect(s.clusterIcons.map(\.name) == ["Netflix", "Spotify", "Figma"])
@@ -97,12 +97,12 @@ struct HomeSummaryTests {
         #expect(s.paidAmount == 0)
     }
 
-    /// clusterNames reflects referenceDate's month, not today's month.
+    /// clusterIcons reflects referenceDate's month, not today's month.
     /// AnnualFeb is a yearly sub anchored Feb 3 2025; it charges Feb 3 2026 but has no Jan charge.
     /// Netflix charges Feb 10 2026 (Dec 10 + 2 months). With referenceDate = Feb 2026:
-    ///   clusterNames = ["AnnualFeb", "Netflix"] (sorted Feb 3 < Feb 10).
+    ///   clusterIcons = ["AnnualFeb", "Netflix"] (sorted Feb 3 < Feb 10).
     /// A wrong impl using today (Jan 2026) would give only ["Netflix"] (AnnualFeb has no Jan charge).
-    @Test func clusterNamesKeyedOffReferenceDate() {
+    @Test func clusterIconsKeyedOffReferenceDate() {
         let annualFeb = Subscription(name: "AnnualFeb", amount: Decimal(string: "100.00")!,
                                      billingCycle: .yearly, anchorDate: date(2025, 2, 3),
                                      status: .active, category: "Test")

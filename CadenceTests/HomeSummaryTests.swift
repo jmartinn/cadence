@@ -13,9 +13,11 @@ struct HomeSummaryTests {
     }
 
     private func sub(_ name: String, _ amount: String, day: Int,
-                     status: SubscriptionStatus = .active, card: Bool = false) -> Subscription {
+                     status: SubscriptionStatus = .active, card: Bool = false,
+                     serviceKey: String? = nil) -> Subscription {
         Subscription(name: name, amount: Decimal(string: amount)!, billingCycle: .monthly,
                      anchorDate: date(2025, 12, day), status: status, category: "Test",
+                     serviceKey: serviceKey,
                      paymentBrand: card ? "Visa" : nil, paymentLast4: card ? "4821" : nil)
     }
 
@@ -29,10 +31,10 @@ struct HomeSummaryTests {
         #expect(s.paidAmount == Decimal(string: "17.99")!)   // only Dec 4 ≤ Dec 11
     }
 
-    @Test func clusterNamesAreOrderedByChargeDate() {
+    @Test func clusterIconsAreOrderedByChargeDate() {
         let subs = [sub("Figma", "15.00", day: 12), sub("Netflix", "17.99", day: 4), sub("Spotify", "10.99", day: 8)]
         let s = HomeSummary.make(subscriptions: subs, anchor: nil, referenceDate: date(2025, 12, 11), calendar: utc)
-        #expect(s.clusterNames == ["Netflix", "Spotify", "Figma"])
+        #expect(s.clusterIcons.map(\.name) == ["Netflix", "Spotify", "Figma"])
     }
 
     @Test func projectedIsNilWithoutAnchor() {
@@ -56,7 +58,7 @@ struct HomeSummaryTests {
                     sub("C", "30.00", day: 6, status: .ended)]
         let s = HomeSummary.make(subscriptions: subs, anchor: nil, referenceDate: date(2025, 12, 11), calendar: utc)
         #expect(s.total == 1)
-        #expect(s.clusterNames == ["A"])
+        #expect(s.clusterIcons.map(\.name) == ["A"])
     }
 
     @Test func renewingIsThisMonthSortedByChargeDate() {
@@ -95,12 +97,12 @@ struct HomeSummaryTests {
         #expect(s.paidAmount == 0)
     }
 
-    /// clusterNames reflects referenceDate's month, not today's month.
+    /// clusterIcons reflects referenceDate's month, not today's month.
     /// AnnualFeb is a yearly sub anchored Feb 3 2025; it charges Feb 3 2026 but has no Jan charge.
     /// Netflix charges Feb 10 2026 (Dec 10 + 2 months). With referenceDate = Feb 2026:
-    ///   clusterNames = ["AnnualFeb", "Netflix"] (sorted Feb 3 < Feb 10).
+    ///   clusterIcons = ["AnnualFeb", "Netflix"] (sorted Feb 3 < Feb 10).
     /// A wrong impl using today (Jan 2026) would give only ["Netflix"] (AnnualFeb has no Jan charge).
-    @Test func clusterNamesKeyedOffReferenceDate() {
+    @Test func clusterIconsKeyedOffReferenceDate() {
         let annualFeb = Subscription(name: "AnnualFeb", amount: Decimal(string: "100.00")!,
                                      billingCycle: .yearly, anchorDate: date(2025, 2, 3),
                                      status: .active, category: "Test")
@@ -109,7 +111,24 @@ struct HomeSummaryTests {
                                  referenceDate: date(2026, 2, 15),
                                  today: date(2026, 1, 15),
                                  calendar: utc)
-        #expect(s.clusterNames == ["AnnualFeb", "Netflix"])
+        #expect(s.clusterIcons.map(\.name) == ["AnnualFeb", "Netflix"])
+    }
+
+    /// clusterIcons carries the serviceKey override so manually-picked logos render correctly.
+    /// "My Spotify" won't auto-resolve to the spotify brand by name alone — the override is
+    /// what exercises the path. Before the fix, only name was stored and serviceKey was lost.
+    @Test func clusterIconCarriesServiceKeyOverride() {
+        let subs = [
+            sub("My Spotify", "9.99", day: 4, serviceKey: "spotify"),
+            sub("Netflix", "17.99", day: 10),
+        ]
+        let s = HomeSummary.make(subscriptions: subs, anchor: nil,
+                                 referenceDate: date(2025, 12, 11), calendar: utc)
+        #expect(s.clusterIcons.count == 2)
+        #expect(s.clusterIcons[0].name == "My Spotify")
+        #expect(s.clusterIcons[0].serviceKey == "spotify")
+        #expect(s.clusterIcons[1].name == "Netflix")
+        #expect(s.clusterIcons[1].serviceKey == nil)
     }
 
     /// renewing(referenceDate:) returns subscriptions with a charge in referenceDate's month.

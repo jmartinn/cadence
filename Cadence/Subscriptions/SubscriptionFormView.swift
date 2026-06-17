@@ -38,6 +38,17 @@ struct SubscriptionFormView: View {
             Form {
                 Section {
                     TextField("Name", text: $draft.name)
+                    NavigationLink {
+                        BrandPickerView(serviceKey: $draft.serviceKey)
+                    } label: {
+                        HStack(spacing: 12) {
+                            ServiceIcon(serviceKey: draft.serviceKey, name: draft.name, size: 28)
+                            Text("Icon")
+                            Spacer()
+                            Text(BrandPickerModel.effectiveLabel(serviceKey: draft.serviceKey, name: draft.name))
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                     TextField("Amount", text: $draft.amount)
                         .keyboardType(.decimalPad)
                     Picker("Billing cycle", selection: $draft.billingCycle) {

@@ -16,6 +16,8 @@ struct SubscriptionDraft: Sendable, Equatable {
     /// Stable identity of the chosen parent (or nil = standalone). Stored as an identifier,
     /// not a model, so the draft stays `Sendable`/`Equatable`. Resolved to a model on save.
     var parentID: PersistentIdentifier?
+    /// Explicitly chosen brand slug (e.g. "netflix"), or nil = resolve the logo from the name.
+    var serviceKey: String?
 
     enum Invalid: Equatable { case emptyName, invalidAmount, invalidLast4 }
 
@@ -27,7 +29,8 @@ struct SubscriptionDraft: Sendable, Equatable {
         category: String = "",
         paymentBrand: String = "",
         paymentLast4: String = "",
-        parentID: PersistentIdentifier? = nil
+        parentID: PersistentIdentifier? = nil,
+        serviceKey: String? = nil
     ) {
         self.name = name
         self.amount = amount
@@ -37,6 +40,7 @@ struct SubscriptionDraft: Sendable, Equatable {
         self.paymentBrand = paymentBrand
         self.paymentLast4 = paymentLast4
         self.parentID = parentID
+        self.serviceKey = serviceKey
     }
 
     /// Blank draft for Add mode. `now` is injected (no `Date()` side effect) for testability.
@@ -52,6 +56,7 @@ struct SubscriptionDraft: Sendable, Equatable {
         paymentBrand = sub.paymentBrand ?? ""
         paymentLast4 = sub.paymentLast4 ?? ""
         parentID = sub.parent?.persistentModelID
+        serviceKey = sub.serviceKey
     }
 
     /// Parses `amount` using the device locale's decimal separator ("," in es, "." in en).
@@ -85,6 +90,7 @@ struct SubscriptionDraft: Sendable, Equatable {
         sub.paymentBrand = brand.isEmpty ? nil : brand
         sub.paymentLast4 = last4.isEmpty ? nil : last4
         sub.parent = parent
+        sub.serviceKey = serviceKey
     }
 
     /// Localized prefill (no grouping) so it round-trips through `parsedAmount`: 17.99 -> "17,99" (es) / "17.99" (en).

@@ -27,7 +27,7 @@ enum ServiceCatalog {
         ServiceBrand(slug: "nyt", displayName: "NYT", hex: "#000000", iconAssetName: "nyt", aliases: ["newyorktimes", "thenewyorktimes"]),
         ServiceBrand(slug: "figma", displayName: "Figma", hex: "#F24E1E", iconAssetName: "figma", aliases: []),
         ServiceBrand(slug: "spotify", displayName: "Spotify", hex: "#1DB954", iconAssetName: "spotify", aliases: []),
-        ServiceBrand(slug: "icloud", displayName: "iCloud+", hex: "#3693F3", iconAssetName: nil, aliases: ["icloudplus"]),
+        ServiceBrand(slug: "icloud", displayName: "iCloud+", hex: "#3693F3", iconAssetName: "icloud", aliases: ["icloudplus"]),
         ServiceBrand(slug: "notion", displayName: "Notion", hex: "#000000", iconAssetName: "notion", aliases: []),
         ServiceBrand(slug: "youtube", displayName: "YouTube Premium", hex: "#FF0000", iconAssetName: "youtube", aliases: ["youtubepremium"]),
         ServiceBrand(slug: "amazon-prime", displayName: "Amazon Prime", hex: "#00A8E1", iconAssetName: "amazon-prime", aliases: ["amazonprimevideo", "primevideo"]),
@@ -66,9 +66,9 @@ enum ServiceCatalog {
         ServiceBrand(slug: "claude", displayName: "Claude", hex: "#D97757", iconAssetName: "claude", aliases: ["anthropic", "claudeai"]),
         ServiceBrand(slug: "perplexity", displayName: "Perplexity", hex: "#20B2AA", iconAssetName: "perplexity", aliases: ["perplexityai"]),
         ServiceBrand(slug: "midjourney", displayName: "Midjourney", hex: "#000000", iconAssetName: nil, aliases: ["mj"]),
-        ServiceBrand(slug: "github-copilot", displayName: "GitHub Copilot", hex: "#24292E", iconAssetName: nil, aliases: ["copilot", "ghcopilot"]),
+        ServiceBrand(slug: "github-copilot", displayName: "GitHub Copilot", hex: "#24292E", iconAssetName: "github-copilot", aliases: ["copilot", "ghcopilot"]),
         ServiceBrand(slug: "grok", displayName: "Grok", hex: "#000000", iconAssetName: "grok", aliases: ["xai", "grokai"]),
-        ServiceBrand(slug: "cursor", displayName: "Cursor", hex: "#000000", iconAssetName: nil, aliases: ["cursorai", "anysphere"]),
+        ServiceBrand(slug: "cursor", displayName: "Cursor", hex: "#000000", iconAssetName: "cursor", aliases: ["cursorai", "anysphere"]),
 
         // News & Reading
         ServiceBrand(slug: "the-economist", displayName: "The Economist", hex: "#E3120B", iconAssetName: "the-economist", aliases: ["economist"]),

@@ -6,7 +6,7 @@ struct PaidSummaryView: View {
     let paid: Int
     let total: Int
     let paidAmount: Decimal
-    let clusterNames: [String]
+    let clusterIcons: [ClusterIcon]
 
     private static let clusterLimit = 2
 
@@ -30,11 +30,11 @@ struct PaidSummaryView: View {
     }
 
     @ViewBuilder private var cluster: some View {
-        let shown = Array(clusterNames.prefix(Self.clusterLimit))
-        let overflow = max(0, clusterNames.count - Self.clusterLimit)
+        let shown = Array(clusterIcons.prefix(Self.clusterLimit))
+        let overflow = max(0, clusterIcons.count - Self.clusterLimit)
         HStack(spacing: -Space.sm) {
-            ForEach(Array(shown.enumerated()), id: \.offset) { _, name in
-                ServiceIcon(name: name, size: 28)
+            ForEach(Array(shown.enumerated()), id: \.offset) { _, icon in
+                ServiceIcon(serviceKey: icon.serviceKey, name: icon.name, size: 28)
                     .overlay(Circle().stroke(Color(.systemBackground), lineWidth: 2))
             }
             if overflow > 0 {
@@ -50,7 +50,10 @@ struct PaidSummaryView: View {
 }
 
 #Preview {
-    PaidSummaryView(paid: 2, total: 9, paidAmount: Decimal(string: "28.98")!,
-                    clusterNames: ["Netflix", "Spotify", "Figma", "Twitch", "iCloud+", "Amazon Prime", "X", "Y", "Z"])
-        .padding()
+    PaidSummaryView(
+        paid: 2, total: 9, paidAmount: Decimal(string: "28.98")!,
+        clusterIcons: ["Netflix", "Spotify", "Figma", "Twitch", "iCloud+", "Amazon Prime", "X", "Y", "Z"]
+            .map { ClusterIcon(name: $0, serviceKey: nil) }
+    )
+    .padding()
 }

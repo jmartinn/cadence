@@ -92,6 +92,90 @@ enum CadenceSchemaV1: VersionedSchema {
     }
 }
 
+/// V2 — adds the display-only self-referential add-on relationship. Additive & optional, so
+/// the V1→V2 migration is lightweight (see `CadenceMigrationPlan`). Still CloudKit-legal:
+/// the relationship is optional/defaulted, declares its inverse, and there is no `.unique`.
+enum CadenceSchemaV2: VersionedSchema {
+    static var versionIdentifier = Schema.Version(2, 0, 0)
+
+    static var models: [any PersistentModel.Type] {
+        [Subscription.self, BalanceAnchor.self]
+    }
+
+    @Model
+    final class Subscription {
+        var name: String = ""
+        var amount: Decimal = 0
+        var billingCycle: BillingCycle = BillingCycle.monthly
+        var anchorDate: Date = Date.distantPast
+        var status: SubscriptionStatus = SubscriptionStatus.active
+        var category: String = ""
+        var serviceKey: String?
+        var paymentBrand: String?
+        var paymentLast4: String?
+
+        /// This subscription's add-ons (e.g. Amazon Prime → its channels). Defaulted `[]` =>
+        /// CloudKit-legal. `.nullify` => deleting the parent orphans add-ons into standalone
+        /// subs; it never cascade-deletes a sub that is still billing the user.
+        @Relationship(deleteRule: .nullify, inverse: \Subscription.parent)
+        var addOns: [Subscription] = []
+
+        /// nil => standalone; non-nil => this subscription IS an add-on of `parent`.
+        var parent: Subscription?
+
+        init(
+            name: String,
+            amount: Decimal,
+            billingCycle: BillingCycle,
+            anchorDate: Date,
+            status: SubscriptionStatus = .active,
+            category: String,
+            serviceKey: String? = nil,
+            paymentBrand: String? = nil,
+            paymentLast4: String? = nil
+        ) {
+            self.name = name
+            self.amount = amount
+            self.billingCycle = billingCycle
+            self.anchorDate = anchorDate
+            self.status = status
+            self.category = category
+            self.serviceKey = serviceKey
+            self.paymentBrand = paymentBrand
+            self.paymentLast4 = paymentLast4
+        }
+
+        var plan: SubscriptionPlan {
+            SubscriptionPlan(
+                amount: amount,
+                cycle: billingCycle,
+                anchorDate: anchorDate,
+                status: status
+            )
+        }
+    }
+
+    @Model
+    final class BalanceAnchor {
+        var balance: Decimal = 0
+        var asOfDate: Date = Date.distantPast
+        var monthlyIncome: Decimal = 0
+        var incomePayday: Date = Date.distantPast
+
+        init(
+            balance: Decimal,
+            asOfDate: Date,
+            monthlyIncome: Decimal = 0,
+            incomePayday: Date = .distantPast
+        ) {
+            self.balance = balance
+            self.asOfDate = asOfDate
+            self.monthlyIncome = monthlyIncome
+            self.incomePayday = incomePayday
+        }
+    }
+}
+
 /// Stable, call-site-friendly names that stay constant across schema versions.
-typealias Subscription = CadenceSchemaV1.Subscription
-typealias BalanceAnchor = CadenceSchemaV1.BalanceAnchor
+typealias Subscription = CadenceSchemaV2.Subscription
+typealias BalanceAnchor = CadenceSchemaV2.BalanceAnchor

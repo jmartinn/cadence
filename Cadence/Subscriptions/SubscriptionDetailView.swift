@@ -28,6 +28,7 @@ struct SubscriptionDetailView: View {
             VStack(spacing: Space.xl) {
                 header
                 infoCard
+                addOnsSection
                 recentCharges
                 actions
             }
@@ -105,6 +106,13 @@ struct SubscriptionDetailView: View {
             InfoRow(systemImage: "calendar", label: "Next charge", value: nextChargeText)
             Divider().padding(.leading, Space.lg)
             InfoRow(systemImage: "tag", label: "Category", value: subscription.category)
+            if let parent = subscription.parent {
+                Divider().padding(.leading, Space.lg)
+                NavigationLink(value: parent) {
+                    InfoRow(systemImage: "square.stack.3d.up", label: "Part of", value: parent.name)
+                }
+                .buttonStyle(.plain)
+            }
             if let payment = paymentText {
                 Divider().padding(.leading, Space.lg)
                 InfoRow(systemImage: "creditcard", label: "Payment method", value: payment)
@@ -131,6 +139,59 @@ struct SubscriptionDetailView: View {
         guard let brand = subscription.paymentBrand, let last4 = subscription.paymentLast4,
               !brand.isEmpty, !last4.isEmpty else { return nil }
         return "\(brand) •••• \(last4)"
+    }
+
+    // MARK: Add-ons section
+
+    private var sortedAddOns: [Subscription] {
+        subscription.addOns.sorted {
+            $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+        }
+    }
+
+    private var combinedTotalText: String {
+        let total = SubscriptionListPresenter.combinedMonthly(for: subscription)
+        let code = Locale.current.currency?.identifier ?? "USD"
+        return "\(total.formatted(.currency(code: code)))/mo with add-ons"
+    }
+
+    @ViewBuilder private var addOnsSection: some View {
+        if !subscription.addOns.isEmpty {
+            let addOns = sortedAddOns
+            VStack(alignment: .leading, spacing: Space.md) {
+                Text("Add-ons").font(.system(size: 18, weight: .bold))
+                VStack(spacing: 0) {
+                    ForEach(addOns) { addOn in
+                        NavigationLink(value: addOn) {
+                            HStack(spacing: Space.md) {
+                                ServiceIcon(serviceKey: addOn.serviceKey, name: addOn.name)
+                                Text(addOn.name)
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundColor(.primary)
+                                Spacer(minLength: Space.sm)
+                                PriceText(addOn.amount, symbolPosition: .trailing,
+                                          suffix: addOn.billingCycle == .monthly ? "/m" : "/y",
+                                          wholeSize: 16, symbolSize: 16, centsSize: 11)
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(Color(.tertiaryLabel))
+                            }
+                            .padding(Space.lg)
+                        }
+                        .buttonStyle(.plain)
+                        if addOn.persistentModelID != addOns.last?.persistentModelID {
+                            Divider().padding(.leading, Space.lg)
+                        }
+                    }
+                }
+                .background(Color(.secondarySystemGroupedBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                Text(combinedTotalText)
+                    .font(.system(size: 13))
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 
     // MARK: Recent charges

@@ -1,5 +1,6 @@
 import CadenceKit
 import Foundation
+import SwiftData
 
 /// Editable, validatable form state for the Add/Edit sheet — the only non-trivial logic in the
 /// form, kept pure so it unit-tests without SwiftUI (mirrors `SubscriptionListPresenter`).
@@ -12,6 +13,9 @@ struct SubscriptionDraft: Sendable, Equatable {
     var category: String = ""
     var paymentBrand: String = ""
     var paymentLast4: String = ""
+    /// Stable identity of the chosen parent (or nil = standalone). Stored as an identifier,
+    /// not a model, so the draft stays `Sendable`/`Equatable`. Resolved to a model on save.
+    var parentID: PersistentIdentifier?
 
     enum Invalid: Equatable { case emptyName, invalidAmount, invalidLast4 }
 
@@ -22,7 +26,8 @@ struct SubscriptionDraft: Sendable, Equatable {
         anchorDate: Date,
         category: String = "",
         paymentBrand: String = "",
-        paymentLast4: String = ""
+        paymentLast4: String = "",
+        parentID: PersistentIdentifier? = nil
     ) {
         self.name = name
         self.amount = amount
@@ -31,6 +36,7 @@ struct SubscriptionDraft: Sendable, Equatable {
         self.category = category
         self.paymentBrand = paymentBrand
         self.paymentLast4 = paymentLast4
+        self.parentID = parentID
     }
 
     /// Blank draft for Add mode. `now` is injected (no `Date()` side effect) for testability.
@@ -45,6 +51,7 @@ struct SubscriptionDraft: Sendable, Equatable {
         category = sub.category
         paymentBrand = sub.paymentBrand ?? ""
         paymentLast4 = sub.paymentLast4 ?? ""
+        parentID = sub.parent?.persistentModelID
     }
 
     /// Parses `amount` using the device locale's decimal separator ("," in es, "." in en).
@@ -64,9 +71,10 @@ struct SubscriptionDraft: Sendable, Equatable {
 
     var isValid: Bool { validationError == nil }
 
-    /// Writes validated values onto a model. Empty payment fields become `nil` so the detail
-    /// row hides cleanly. Call only when `isValid`.
-    func apply(to sub: Subscription) {
+    /// Writes validated values onto a model. Empty payment fields become `nil`. `parent` is
+    /// the resolved model for `parentID` (the view looks it up); pass `nil` for standalone.
+    /// Call only when `isValid`.
+    func apply(to sub: Subscription, parent: Subscription?) {
         sub.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
         if let amt = parsedAmount { sub.amount = amt }
         sub.billingCycle = billingCycle
@@ -76,6 +84,7 @@ struct SubscriptionDraft: Sendable, Equatable {
         let last4 = paymentLast4.trimmingCharacters(in: .whitespaces)
         sub.paymentBrand = brand.isEmpty ? nil : brand
         sub.paymentLast4 = last4.isEmpty ? nil : last4
+        sub.parent = parent
     }
 
     /// Localized prefill (no grouping) so it round-trips through `parsedAmount`: 17.99 -> "17,99" (es) / "17.99" (en).

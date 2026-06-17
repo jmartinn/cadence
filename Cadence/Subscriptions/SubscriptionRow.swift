@@ -24,6 +24,11 @@ struct SubscriptionRow: View {
                 Text(nextChargeText)
                     .font(.system(size: 13))
                     .foregroundColor(.secondary)
+                if let parent = subscription.parent {
+                    Text("Part of \(parent.name)")
+                        .font(.system(size: 12))
+                        .foregroundColor(.secondary)
+                }
             }
             Spacer(minLength: Space.sm)
             PriceText(

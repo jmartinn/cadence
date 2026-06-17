@@ -1,0 +1,7 @@
+# <type>(<scope>): <description>   — single line, ≤72 chars, no body
+#
+# type:  feat fix docs style refactor perf test build ci chore revert
+# scope: optional, lowercase  (e.g. home, components, domain, hooks)
+# rules: lowercase except proper nouns; imperative mood; no trailing period
+#
+# Split unrelated changes into separate commits. Bypass hooks with --no-verify.

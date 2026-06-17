@@ -27,6 +27,13 @@ A three-stage gate, run in order, before considering work done:
 
 `.swiftformat` and `.swiftlint.yml` are committed (and tuned to leave the locked `Cadence/Domain/**` untouched); `scripts/` is git-excluded (local-only). This is the required gate before considering work done.
 
+**Git hooks (one-time per clone):** Commit conventions are enforced by tracked hooks in `.githooks/`. Activate them with:
+```bash
+git config core.hooksPath .githooks
+git config commit.template .gitmessage
+```
+`commit-msg` validates the subject (Conventional Commits, ≤72 chars, no body — see `.githooks/lib/validate-subject.sh`); `pre-commit` runs swiftformat/swiftlint on staged Swift. Bypass in exceptional cases with `git commit --no-verify`. CI lints the PR title against the same validator.
+
 **Dev workflow is device-first** — the app is built/run on a physical iPhone, not the simulator. Manual `xcodebuild` against a device:
 ```bash
 DEVICE_ID=$(xcrun devicectl list devices | grep -iE 'available|connected' | grep -oE '[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}' | head -1)

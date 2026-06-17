@@ -1,90 +1,95 @@
 import SwiftUI
 
-/// One known service's brand identity. `hex` is a hand-picked brand color (the stand-in for a
-/// future logo asset, see spec §8); `color` parses it lazily so the table stays readable and a
-/// typo surfaces in `Color(hex:)` rather than at a force-unwrap.
+/// One known service's brand identity. `hex` is the monogram-fallback tile color;
+/// `iconAssetName` names a bundled App Store app icon (== `slug` when present, `nil` when no icon
+/// is bundled → monogram fallback). `color` parses `hex` lazily so a typo surfaces in
+/// `Color(hex:)` rather than at a force-unwrap.
 struct ServiceBrand: Equatable {
     let slug: String // canonical key, e.g. "netflix"
     let displayName: String // e.g. "Netflix"
-    let hex: String // "#RRGGBB"
+    let hex: String // "#RRGGBB" — monogram-fallback tile color
+    let iconAssetName: String? // bundled app-icon asset name (== slug), nil = no logo → monogram
     let aliases: [String] // extra normalized forms that resolve here, e.g. ["disney"]
 
     var color: Color { Color(hex: hex) ?? .gray }
 }
 
 /// Pure presentation-layer lookup: a flat brand table plus an O(1) resolver. No persistence or
-/// domain involvement. Resolution order: explicit serviceKey → normalized name slug → alias → nil.
+/// domain involvement. Resolution order: explicit serviceKey → normalized name slug → alias →
+/// longest-prefix fallback → nil.
 enum ServiceCatalog {
     /// The brand table — 50+ entries covering streaming, music, productivity, AI, news,
     /// fitness, and gaming. The resolver and tests are size-agnostic.
     static let all: [ServiceBrand] = [
         // Seed
-        ServiceBrand(slug: "netflix", displayName: "Netflix", hex: "#E50914", aliases: []),
-        ServiceBrand(slug: "disney-plus", displayName: "Disney+", hex: "#113CCF", aliases: ["disney"]),
-        ServiceBrand(slug: "nyt", displayName: "NYT", hex: "#000000", aliases: ["newyorktimes", "thenewyorktimes"]),
-        ServiceBrand(slug: "figma", displayName: "Figma", hex: "#F24E1E", aliases: []),
-        ServiceBrand(slug: "spotify", displayName: "Spotify", hex: "#1DB954", aliases: []),
-        ServiceBrand(slug: "icloud", displayName: "iCloud+", hex: "#3693F3", aliases: ["icloudplus"]),
-        ServiceBrand(slug: "notion", displayName: "Notion", hex: "#000000", aliases: []),
-        ServiceBrand(slug: "youtube", displayName: "YouTube Premium", hex: "#FF0000", aliases: ["youtubepremium"]),
-        ServiceBrand(slug: "amazon-prime", displayName: "Amazon Prime", hex: "#00A8E1", aliases: ["amazonprimevideo", "primevideo"]),
+        ServiceBrand(slug: "netflix", displayName: "Netflix", hex: "#E50914", iconAssetName: "netflix", aliases: []),
+        ServiceBrand(slug: "disney-plus", displayName: "Disney+", hex: "#113CCF", iconAssetName: "disney-plus", aliases: ["disney"]),
+        ServiceBrand(slug: "nyt", displayName: "NYT", hex: "#000000", iconAssetName: "nyt", aliases: ["newyorktimes", "thenewyorktimes"]),
+        ServiceBrand(slug: "figma", displayName: "Figma", hex: "#F24E1E", iconAssetName: "figma", aliases: []),
+        ServiceBrand(slug: "spotify", displayName: "Spotify", hex: "#1DB954", iconAssetName: "spotify", aliases: []),
+        ServiceBrand(slug: "icloud", displayName: "iCloud+", hex: "#3693F3", iconAssetName: nil, aliases: ["icloudplus"]),
+        ServiceBrand(slug: "notion", displayName: "Notion", hex: "#000000", iconAssetName: "notion", aliases: []),
+        ServiceBrand(slug: "youtube", displayName: "YouTube Premium", hex: "#FF0000", iconAssetName: "youtube", aliases: ["youtubepremium"]),
+        ServiceBrand(slug: "amazon-prime", displayName: "Amazon Prime", hex: "#00A8E1", iconAssetName: "amazon-prime", aliases: ["amazonprimevideo", "primevideo"]),
 
         // Streaming
-        ServiceBrand(slug: "hbo-max", displayName: "Max", hex: "#002BE7", aliases: ["max", "hbo"]),
-        ServiceBrand(slug: "hulu", displayName: "Hulu", hex: "#1CE783", aliases: []),
-        ServiceBrand(slug: "apple-tv-plus", displayName: "Apple TV+", hex: "#000000", aliases: ["appletv", "atv"]),
-        ServiceBrand(slug: "paramount-plus", displayName: "Paramount+", hex: "#0064FF", aliases: ["paramount"]),
-        ServiceBrand(slug: "peacock", displayName: "Peacock", hex: "#F9B500", aliases: ["peacocktv", "nbcpeacock"]),
-        ServiceBrand(slug: "twitch", displayName: "Twitch", hex: "#9146FF", aliases: []),
-        ServiceBrand(slug: "crunchyroll", displayName: "Crunchyroll", hex: "#F47521", aliases: ["cr"]),
+        ServiceBrand(slug: "hbo-max", displayName: "Max", hex: "#002BE7", iconAssetName: "hbo-max", aliases: ["max", "hbo"]),
+        ServiceBrand(slug: "hulu", displayName: "Hulu", hex: "#1CE783", iconAssetName: "hulu", aliases: []),
+        ServiceBrand(slug: "apple-tv-plus", displayName: "Apple TV+", hex: "#000000", iconAssetName: "apple-tv-plus", aliases: ["appletv", "atv"]),
+        ServiceBrand(slug: "paramount-plus", displayName: "Paramount+", hex: "#0064FF", iconAssetName: "paramount-plus", aliases: ["paramount"]),
+        ServiceBrand(slug: "peacock", displayName: "Peacock", hex: "#F9B500", iconAssetName: "peacock", aliases: ["peacocktv", "nbcpeacock"]),
+        ServiceBrand(slug: "twitch", displayName: "Twitch", hex: "#9146FF", iconAssetName: "twitch", aliases: []),
+        ServiceBrand(slug: "crunchyroll", displayName: "Crunchyroll", hex: "#F47521", iconAssetName: "crunchyroll", aliases: ["cr"]),
 
         // Music / Audio
-        ServiceBrand(slug: "apple-music", displayName: "Apple Music", hex: "#FC3C44", aliases: []),
-        ServiceBrand(slug: "youtube-music", displayName: "YouTube Music", hex: "#FF0000", aliases: ["ytmusic"]),
-        ServiceBrand(slug: "tidal", displayName: "Tidal", hex: "#000000", aliases: []),
-        ServiceBrand(slug: "deezer", displayName: "Deezer", hex: "#EF5466", aliases: []),
-        ServiceBrand(slug: "soundcloud", displayName: "SoundCloud", hex: "#FF5500", aliases: []),
-        ServiceBrand(slug: "audible", displayName: "Audible", hex: "#F8991D", aliases: []),
+        ServiceBrand(slug: "apple-music", displayName: "Apple Music", hex: "#FC3C44", iconAssetName: "apple-music", aliases: []),
+        ServiceBrand(slug: "youtube-music", displayName: "YouTube Music", hex: "#FF0000", iconAssetName: "youtube-music", aliases: ["ytmusic"]),
+        ServiceBrand(slug: "tidal", displayName: "Tidal", hex: "#000000", iconAssetName: "tidal", aliases: []),
+        ServiceBrand(slug: "deezer", displayName: "Deezer", hex: "#EF5466", iconAssetName: "deezer", aliases: []),
+        ServiceBrand(slug: "soundcloud", displayName: "SoundCloud", hex: "#FF5500", iconAssetName: "soundcloud", aliases: []),
+        ServiceBrand(slug: "audible", displayName: "Audible", hex: "#F8991D", iconAssetName: "audible", aliases: []),
 
         // Productivity & Cloud
-        ServiceBrand(slug: "google-one", displayName: "Google One", hex: "#4285F4", aliases: ["google1", "googleonestorage"]),
-        ServiceBrand(slug: "dropbox", displayName: "Dropbox", hex: "#0061FF", aliases: ["dbx"]),
-        ServiceBrand(slug: "microsoft-365", displayName: "Microsoft 365", hex: "#0078D4", aliases: ["ms365", "office365", "microsoftoffice", "m365"]),
-        ServiceBrand(slug: "adobe-creative-cloud", displayName: "Adobe Creative Cloud", hex: "#FF0000", aliases: ["adobe", "creativecloud", "adobecc", "cc"]),
-        ServiceBrand(slug: "1password", displayName: "1Password", hex: "#1A6DFF", aliases: ["onepassword", "1pass"]),
-        ServiceBrand(slug: "slack", displayName: "Slack", hex: "#4A154B", aliases: []),
-        ServiceBrand(slug: "linear", displayName: "Linear", hex: "#5E6AD2", aliases: []),
-        ServiceBrand(slug: "github", displayName: "GitHub", hex: "#181717", aliases: ["gh"]),
-        ServiceBrand(slug: "todoist", displayName: "Todoist", hex: "#DB4035", aliases: []),
-        ServiceBrand(slug: "evernote", displayName: "Evernote", hex: "#00A82D", aliases: []),
+        ServiceBrand(slug: "google-one", displayName: "Google One", hex: "#4285F4", iconAssetName: "google-one", aliases: ["google1", "googleonestorage"]),
+        ServiceBrand(slug: "dropbox", displayName: "Dropbox", hex: "#0061FF", iconAssetName: "dropbox", aliases: ["dbx"]),
+        ServiceBrand(slug: "microsoft-365", displayName: "Microsoft 365", hex: "#0078D4", iconAssetName: "microsoft-365", aliases: ["ms365", "office365", "microsoftoffice", "m365"]),
+        ServiceBrand(slug: "adobe-creative-cloud", displayName: "Adobe Creative Cloud", hex: "#FF0000", iconAssetName: "adobe-creative-cloud", aliases: ["adobe", "creativecloud", "adobecc", "cc"]),
+        ServiceBrand(slug: "1password", displayName: "1Password", hex: "#1A6DFF", iconAssetName: "1password", aliases: ["onepassword", "1pass"]),
+        ServiceBrand(slug: "slack", displayName: "Slack", hex: "#4A154B", iconAssetName: "slack", aliases: []),
+        ServiceBrand(slug: "linear", displayName: "Linear", hex: "#5E6AD2", iconAssetName: "linear", aliases: []),
+        ServiceBrand(slug: "github", displayName: "GitHub", hex: "#181717", iconAssetName: "github", aliases: ["gh"]),
+        ServiceBrand(slug: "todoist", displayName: "Todoist", hex: "#DB4035", iconAssetName: "todoist", aliases: []),
+        ServiceBrand(slug: "evernote", displayName: "Evernote", hex: "#00A82D", iconAssetName: "evernote", aliases: []),
 
         // AI
-        ServiceBrand(slug: "chatgpt", displayName: "ChatGPT", hex: "#10A37F", aliases: ["openai", "gpt", "gpt4", "openaichatgpt"]),
-        ServiceBrand(slug: "claude", displayName: "Claude", hex: "#D97757", aliases: ["anthropic", "claudeai"]),
-        ServiceBrand(slug: "perplexity", displayName: "Perplexity", hex: "#20B2AA", aliases: ["perplexityai"]),
-        ServiceBrand(slug: "midjourney", displayName: "Midjourney", hex: "#000000", aliases: ["mj"]),
-        ServiceBrand(slug: "github-copilot", displayName: "GitHub Copilot", hex: "#24292E", aliases: ["copilot", "ghcopilot"]),
+        ServiceBrand(slug: "chatgpt", displayName: "ChatGPT", hex: "#10A37F", iconAssetName: "chatgpt", aliases: ["openai", "gpt", "gpt4", "openaichatgpt"]),
+        ServiceBrand(slug: "claude", displayName: "Claude", hex: "#D97757", iconAssetName: "claude", aliases: ["anthropic", "claudeai"]),
+        ServiceBrand(slug: "perplexity", displayName: "Perplexity", hex: "#20B2AA", iconAssetName: "perplexity", aliases: ["perplexityai"]),
+        ServiceBrand(slug: "midjourney", displayName: "Midjourney", hex: "#000000", iconAssetName: nil, aliases: ["mj"]),
+        ServiceBrand(slug: "github-copilot", displayName: "GitHub Copilot", hex: "#24292E", iconAssetName: nil, aliases: ["copilot", "ghcopilot"]),
+        ServiceBrand(slug: "grok", displayName: "Grok", hex: "#000000", iconAssetName: "grok", aliases: ["xai", "grokai"]),
+        ServiceBrand(slug: "cursor", displayName: "Cursor", hex: "#000000", iconAssetName: nil, aliases: ["cursorai", "anysphere"]),
 
         // News & Reading
-        ServiceBrand(slug: "the-economist", displayName: "The Economist", hex: "#E3120B", aliases: ["economist"]),
-        ServiceBrand(slug: "medium", displayName: "Medium", hex: "#02B875", aliases: []),
-        ServiceBrand(slug: "substack", displayName: "Substack", hex: "#FF6719", aliases: []),
-        ServiceBrand(slug: "kindle-unlimited", displayName: "Kindle Unlimited", hex: "#FF9900", aliases: ["kindle", "ku"]),
+        ServiceBrand(slug: "the-economist", displayName: "The Economist", hex: "#E3120B", iconAssetName: "the-economist", aliases: ["economist"]),
+        ServiceBrand(slug: "medium", displayName: "Medium", hex: "#02B875", iconAssetName: "medium", aliases: []),
+        ServiceBrand(slug: "substack", displayName: "Substack", hex: "#FF6719", iconAssetName: "substack", aliases: []),
+        ServiceBrand(slug: "kindle-unlimited", displayName: "Kindle Unlimited", hex: "#FF9900", iconAssetName: "kindle-unlimited", aliases: ["kindle", "ku"]),
 
         // Fitness & Lifestyle
-        ServiceBrand(slug: "strava", displayName: "Strava", hex: "#FC4C02", aliases: []),
-        ServiceBrand(slug: "peloton", displayName: "Peloton", hex: "#D9232E", aliases: []),
-        ServiceBrand(slug: "headspace", displayName: "Headspace", hex: "#F47D31", aliases: []),
-        ServiceBrand(slug: "calm", displayName: "Calm", hex: "#4A90D9", aliases: []),
-        ServiceBrand(slug: "duolingo", displayName: "Duolingo", hex: "#58CC02", aliases: []),
+        ServiceBrand(slug: "strava", displayName: "Strava", hex: "#FC4C02", iconAssetName: "strava", aliases: []),
+        ServiceBrand(slug: "peloton", displayName: "Peloton", hex: "#D9232E", iconAssetName: "peloton", aliases: []),
+        ServiceBrand(slug: "headspace", displayName: "Headspace", hex: "#F47D31", iconAssetName: "headspace", aliases: []),
+        ServiceBrand(slug: "calm", displayName: "Calm", hex: "#4A90D9", iconAssetName: "calm", aliases: []),
+        ServiceBrand(slug: "duolingo", displayName: "Duolingo", hex: "#58CC02", iconAssetName: "duolingo", aliases: []),
 
         // Gaming
-        ServiceBrand(slug: "playstation-plus", displayName: "PlayStation Plus", hex: "#003791", aliases: ["psplus", "psnplus", "playstation"]),
-        ServiceBrand(slug: "xbox-game-pass", displayName: "Xbox Game Pass", hex: "#107C10", aliases: ["gamepass", "xgp", "xbox"]),
-        ServiceBrand(slug: "nintendo-switch-online", displayName: "Nintendo Switch Online", hex: "#E60012", aliases: ["nso", "switchonline", "nintendo"]),
+        ServiceBrand(slug: "playstation-plus", displayName: "PlayStation Plus", hex: "#003791", iconAssetName: "playstation-plus", aliases: ["psplus", "psnplus", "playstation"]),
+        ServiceBrand(slug: "xbox-game-pass", displayName: "Xbox Game Pass", hex: "#107C10", iconAssetName: "xbox-game-pass", aliases: ["gamepass", "xgp", "xbox"]),
+        ServiceBrand(slug: "nintendo-switch-online", displayName: "Nintendo Switch Online", hex: "#E60012", iconAssetName: "nintendo-switch-online", aliases: ["nso", "switchonline", "nintendo"]),
 
         // Social & Community
-        ServiceBrand(slug: "discord", displayName: "Discord", hex: "#5865F2", aliases: []),
+        ServiceBrand(slug: "discord", displayName: "Discord", hex: "#5865F2", iconAssetName: "discord", aliases: []),
     ]
 
     /// Lowercase and strip every non-alphanumeric character. "Disney+" → "disney",
@@ -108,9 +113,25 @@ enum ServiceCatalog {
         return map
     }()
 
-    /// Resolve a subscription to its brand: explicit `serviceKey` first, then the display name.
+    /// Resolve a subscription to its brand: explicit `serviceKey` first, then the display name,
+    /// then a longest-prefix fallback so an extended label still resolves (e.g. "Claude Code" →
+    /// claude, "Spotify Premium" → spotify).
     static func brand(serviceKey: String?, name: String) -> ServiceBrand? {
         if let key = serviceKey, let hit = index[normalize(key)] { return hit }
-        return index[normalize(name)]
+        let normalizedName = normalize(name)
+        if let hit = index[normalizedName] { return hit }
+        return prefixMatch(normalizedName)
+    }
+
+    /// Fallback for inputs that extend a known key. Requires the matched key to be ≥4 characters,
+    /// so short aliases ("gh", "cc") can't swallow unrelated names (e.g. "Ghost" must not hit
+    /// github's "gh"), and picks the longest matching key to prefer the most specific brand.
+    private static func prefixMatch(_ normalized: String) -> ServiceBrand? {
+        guard normalized.count >= 4 else { return nil }
+        var best: (key: String, brand: ServiceBrand)?
+        for (key, brand) in index where key.count >= 4 && normalized.hasPrefix(key) {
+            if best == nil || key.count > best!.key.count { best = (key, brand) }
+        }
+        return best?.brand
     }
 }

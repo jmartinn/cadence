@@ -1,0 +1,27 @@
+#!/bin/sh
+# Block a commit whose staged Swift isn't formatted or has lint errors.
+# Bypass with: git commit --no-verify
+staged=$(git diff --cached --name-only --diff-filter=ACM -- '*.swift')
+[ -z "$staged" ] && exit 0
+
+if command -v swiftformat >/dev/null 2>&1; then
+  # word-splitting on $staged is intentional (no spaces in repo paths)
+  if ! swiftformat --lint $staged >/dev/null 2>&1; then
+    echo "✗ staged Swift is unformatted — run: swiftformat $staged"
+    exit 1
+  fi
+else
+  echo "⚠ swiftformat not found — skipping format check (CI still enforces it)"
+fi
+
+if command -v swiftlint >/dev/null 2>&1; then
+  # swiftlint exits non-zero only on error-severity violations; warnings are advisory.
+  if ! swiftlint lint --quiet --force-exclude $staged; then
+    echo "✗ swiftlint reported error-severity violations in staged Swift"
+    exit 1
+  fi
+else
+  echo "⚠ swiftlint not found — skipping lint check (CI still enforces it)"
+fi
+
+exit 0

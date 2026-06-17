@@ -1,0 +1,18 @@
+#!/bin/sh
+# Reject a commit body and validate the subject (Cadence conventions).
+# Bypass with: git commit --no-verify
+msg_file="$1"
+here=$(dirname "$0")
+
+# Content = lines that are neither blank nor comments.
+content=$(grep -vE '^[[:space:]]*#' "$msg_file" | sed '/^[[:space:]]*$/d')
+subject=$(printf '%s\n' "$content" | sed -n '1p')
+extra=$(printf '%s\n' "$content" | sed -n '2,$p')
+
+if [ -n "$extra" ]; then
+  echo "✗ commit message must be a single subject line — no body."
+  echo "  split unrelated changes into separate commits; use --no-verify to override."
+  exit 1
+fi
+
+sh "$here/lib/validate-subject.sh" "$subject"

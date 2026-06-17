@@ -55,6 +55,34 @@ enum SubscriptionListPresenter {
         }
     }
 
+    /// True if `subject` may be linked under a parent. A sub that already has add-ons cannot
+    /// itself become an add-on (one level only). `nil` (Add mode) can always have a parent.
+    static func canHaveParent(_ subject: Subscription?) -> Bool {
+        guard let subject else { return true }
+        return subject.addOns.isEmpty
+    }
+
+    /// Standalone subscriptions that may serve as a parent for `subject`: not `subject` itself,
+    /// and not already an add-on. Sorted A→Z for stable picker order.
+    static func eligibleParents(
+        for subject: Subscription?,
+        among all: [Subscription]
+    ) -> [Subscription] {
+        all.filter { candidate in
+            candidate.parent == nil
+                && candidate.persistentModelID != subject?.persistentModelID
+        }
+        .sorted { byName($0, $1) }
+    }
+
+    /// Monthly-equivalent total for a parent and its add-ons, counting only `.active` members
+    /// (matches the forecast). Used for the "…/mo with add-ons" caption on the parent detail.
+    static func combinedMonthly(for parent: Subscription) -> Decimal {
+        ([parent] + parent.addOns)
+            .filter { $0.status == .active }
+            .reduce(Decimal(0)) { $0 + $1.plan.normalizedMonthlyAmount }
+    }
+
     /// Localized case-insensitive A→Z tiebreaker.
     private static func byName(_ a: Subscription, _ b: Subscription) -> Bool {
         a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending

@@ -94,10 +94,10 @@ struct SubscriptionFormView: View {
             // init has no defaults, so we pass throwaways and let the draft be the source of truth.
             let sub = Subscription(name: "", amount: 0, billingCycle: .monthly,
                                    anchorDate: .distantPast, category: "")
-            draft.apply(to: sub)
+            draft.apply(to: sub, parent: nil) // TODO(task-3): resolve draft.parentID to a model
             modelContext.insert(sub)
         case let .edit(sub):
-            draft.apply(to: sub)
+            draft.apply(to: sub, parent: nil) // TODO(task-3): resolve draft.parentID to a model
         }
         persist()
         dismiss()

@@ -55,7 +55,7 @@ struct SubscriptionDraftTests {
         let draft = SubscriptionDraft(from: source)
         let dest = Subscription(name: "", amount: 0, billingCycle: .monthly,
                                 anchorDate: .distantPast, category: "")
-        draft.apply(to: dest)
+        draft.apply(to: dest, parent: nil)
         #expect(dest.name == "Spotify")
         #expect(dest.amount == Decimal(string: "10.99")!)
         #expect(dest.billingCycle == .yearly)
@@ -66,7 +66,7 @@ struct SubscriptionDraftTests {
         var blankPay = SubscriptionDraft(from: source)
         blankPay.paymentBrand = "  "
         blankPay.paymentLast4 = ""
-        blankPay.apply(to: dest)
+        blankPay.apply(to: dest, parent: nil)
         #expect(dest.paymentBrand == nil)
         #expect(dest.paymentLast4 == nil)
     }

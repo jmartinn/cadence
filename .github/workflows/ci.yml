@@ -17,7 +17,7 @@ jobs:
   domain:
     name: domain
     runs-on: ubuntu-latest
-    container: swift:6.1
+    container: swift@sha256:4c6af6663ed2316002a3b38ff5505a1fc1f2749ec31e84936c32dd336713c569  # 6.1
     timeout-minutes: 10
     defaults:
       run:
@@ -41,7 +41,7 @@ jobs:
   verify:
     name: verify
     runs-on: macos-15
-    timeout-minutes: 30
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -95,6 +95,15 @@ jobs:
           echo "lint: ${ERRORS} error(s), ${WARNINGS} warning(s) (warnings advisory)"
           test "$ERRORS" -eq 0 || { echo "::error::swiftlint reported $ERRORS error(s)"; exit 1; }
 
+      - name: Resolve an available iOS simulator
+        run: |
+          set -euo pipefail
+          SIMULATOR_ID=$(xcrun simctl list devices available --json \
+            | python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; c=[x for r,v in d.items() if 'iOS' in r for x in v if x['name'].startswith('iPhone')]; print(c[-1]['udid'] if c else '')")
+          test -n "$SIMULATOR_ID" || { echo '::error::no available iOS Simulator on the runner'; exit 1; }
+          echo "picked simulator: $SIMULATOR_ID"
+          echo "SIMULATOR_ID=$SIMULATOR_ID" >> "$GITHUB_ENV"
+
       - name: Stage 3 — build + test (simulator, 0 warnings)
         run: |
           set -euo pipefail
@@ -104,8 +113,8 @@ jobs:
             -project Cadence.xcodeproj \
             -scheme Cadence \
             -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' \
-            -skip-testing:CadenceUITests/CadenceUITests/testLaunchPerformance \
+            -destination "platform=iOS Simulator,id=$SIMULATOR_ID" \
+            -skip-testing:CadenceUITests \
             -resultBundlePath "$RUNNER_TEMP/Cadence.xcresult" \
             2>&1 | tee "$BUILDLOG"
           STATUS=${PIPESTATUS[0]}

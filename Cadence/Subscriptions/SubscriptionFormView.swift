@@ -18,6 +18,7 @@ struct SubscriptionFormView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
+    @Query(sort: \Subscription.name) private var allSubscriptions: [Subscription]
     @State private var draft: SubscriptionDraft
     @State private var showingDeleteConfirm = false
 
@@ -50,6 +51,16 @@ struct SubscriptionFormView: View {
                     TextField("Card brand (e.g. Visa)", text: $draft.paymentBrand)
                     TextField("Last 4 digits", text: $draft.paymentLast4)
                         .keyboardType(.numberPad)
+                }
+                if showsParentPicker {
+                    Section("Part of") {
+                        Picker("Parent subscription", selection: $draft.parentID) {
+                            Text("None").tag(PersistentIdentifier?.none)
+                            ForEach(parentCandidates) { candidate in
+                                Text(candidate.name).tag(Optional(candidate.persistentModelID))
+                            }
+                        }
+                    }
                 }
                 if case .edit = mode {
                     Section {
@@ -87,17 +98,32 @@ struct SubscriptionFormView: View {
         }
     }
 
+    /// The sub being edited (Add mode has none) — used to exclude self and read existing add-ons.
+    private var editingSubject: Subscription? {
+        if case let .edit(sub) = mode { return sub }
+        return nil
+    }
+
+    private var showsParentPicker: Bool {
+        SubscriptionListPresenter.canHaveParent(editingSubject)
+    }
+
+    private var parentCandidates: [Subscription] {
+        SubscriptionListPresenter.eligibleParents(for: editingSubject, among: allSubscriptions)
+    }
+
     private func save() {
+        let parent = allSubscriptions.first { $0.persistentModelID == draft.parentID }
         switch mode {
         case .add:
-            // All values are placeholders that `draft.apply(to:)` overwrites; the Subscription
+            // All values are placeholders that `draft.apply(to:parent:)` overwrites; the Subscription
             // init has no defaults, so we pass throwaways and let the draft be the source of truth.
             let sub = Subscription(name: "", amount: 0, billingCycle: .monthly,
                                    anchorDate: .distantPast, category: "")
-            draft.apply(to: sub, parent: nil) // TODO(task-3): resolve draft.parentID to a model
+            draft.apply(to: sub, parent: parent)
             modelContext.insert(sub)
         case let .edit(sub):
-            draft.apply(to: sub, parent: nil) // TODO(task-3): resolve draft.parentID to a model
+            draft.apply(to: sub, parent: parent)
         }
         persist()
         dismiss()

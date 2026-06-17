@@ -1,4 +1,3 @@
-import Foundation
 import SwiftUI
 
 /// Pure picker logic, unit-tested without SwiftUI (mirrors `SubscriptionListPresenter`).

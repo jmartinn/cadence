@@ -52,6 +52,10 @@ struct CalendarDayCell: View {
         day.isInMonth ? "\(calendar.component(.day, from: day.date))" : ""
     }
 
+    /// The blue "auto-debits to card" badge claims the top-trailing corner; suppress the redundant
+    /// today-dot there when it's shown (the filled tile already marks today).
+    private var hasDebitBadge: Bool { day.markers.first?.hasCard == true }
+
     private var chargeAccessibilityLabel: String {
         let when = Self.a11yDateFormatter.string(from: day.date)
         let names = day.markers.map(\.serviceName)
@@ -62,8 +66,8 @@ struct CalendarDayCell: View {
         let cell = ZStack(alignment: .topTrailing) {
             background
             content
-            if day.isToday { dot.padding(6) }
-            if day.markers.first?.hasCard == true { debitBadge.padding(4) }
+            if day.isToday, !hasDebitBadge { dot.padding(6) }
+            if hasDebitBadge { debitBadge.padding(3) }
         }
         .frame(height: 56)
         .frame(maxWidth: .infinity)
@@ -100,14 +104,19 @@ struct CalendarDayCell: View {
                 .foregroundColor(Color(.tertiaryLabel))
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
-            VStack(spacing: Space.xs) {
+            ZStack {
+                if let marker = day.markers.first {
+                    ServiceIcon(serviceKey: marker.subscription.serviceKey, name: marker.serviceName, size: 22)
+                        .overlay(extraCountBadge)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                        .padding(.bottom, 6)
+                }
                 Text(number)
                     .font(.system(size: 15, weight: day.isToday ? .bold : .regular))
                     .foregroundColor(day.isToday ? Color(.systemBackground) : .primary)
-                if let marker = day.markers.first {
-                    ServiceIcon(serviceKey: marker.subscription.serviceKey, name: marker.serviceName, size: 18)
-                        .overlay(extraCountBadge)
-                }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .padding(.leading, 6)
+                    .padding(.top, 5)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
@@ -135,6 +144,7 @@ struct CalendarDayCell: View {
             .foregroundColor(.white)
             .frame(width: 16, height: 16)
             .background(Circle().fill(Color.blue))
+            .overlay(Circle().strokeBorder(Color(.systemBackground), lineWidth: 1.5))
     }
 }
 

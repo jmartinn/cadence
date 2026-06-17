@@ -2,6 +2,7 @@
 # Validate a commit subject against Cadence conventions.
 # Usage: validate-subject.sh "<subject>"
 # Exit 0 = valid (a case warning still exits 0); 1 = invalid.
+export LC_ALL=C
 subject="$1"
 status=0
 types='feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert'

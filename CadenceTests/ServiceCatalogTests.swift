@@ -77,4 +77,34 @@ struct ServiceCatalogTests {
     @Test func catalogIsBroad() {
         #expect(ServiceCatalog.all.count >= 50, "spec §11.3 requires a broad (50+) catalog")
     }
+
+    @Test func everyNonNilIconAssetNameEqualsSlug() {
+        for brand in ServiceCatalog.all where brand.iconAssetName != nil {
+            #expect(brand.iconAssetName == brand.slug, "\(brand.slug): iconAssetName should equal slug")
+        }
+    }
+
+    @Test func uncoveredBrandsHaveNilIconAssetName() {
+        // No bundled App Store icon: icloud (no app), midjourney (no app), github-copilot (no
+        // distinct app), cursor (desktop app; iOS search returns the wrong app). Everything else
+        // resolves to a real icon.
+        let uncovered = ["icloud", "midjourney", "github-copilot", "cursor"]
+        for slug in uncovered {
+            let brand = ServiceCatalog.brand(serviceKey: slug, name: "")
+            #expect(brand?.iconAssetName == nil, "\(slug) has no bundled icon")
+        }
+    }
+
+    @Test func resolvesExtendedNamesByLongestPrefix() {
+        // An extended label still resolves to its base brand via the prefix fallback.
+        #expect(ServiceCatalog.brand(serviceKey: nil, name: "Claude Code")?.slug == "claude")
+        #expect(ServiceCatalog.brand(serviceKey: nil, name: "Anthropic")?.slug == "claude")
+        #expect(ServiceCatalog.brand(serviceKey: nil, name: "Spotify Premium")?.slug == "spotify")
+    }
+
+    @Test func prefixFallbackIgnoresShortKeysAndUnrelatedNames() {
+        // "Ghost" must not hit github's short "gh" alias, and a truly unknown name stays nil.
+        #expect(ServiceCatalog.brand(serviceKey: nil, name: "Ghost") == nil)
+        #expect(ServiceCatalog.brand(serviceKey: nil, name: "Wat") == nil)
+    }
 }

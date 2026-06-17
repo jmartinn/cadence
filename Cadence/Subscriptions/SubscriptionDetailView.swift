@@ -58,7 +58,7 @@ struct SubscriptionDetailView: View {
 
     private var header: some View {
         VStack(spacing: Space.md) {
-            SubscriptionMonogram(serviceKey: subscription.serviceKey, name: subscription.name, size: 72)
+            ServiceIcon(serviceKey: subscription.serviceKey, name: subscription.name, size: 72)
             Text(subscription.name)
                 .font(.system(size: 24, weight: .bold))
             statusPill

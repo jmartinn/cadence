@@ -34,7 +34,7 @@ struct PaidSummaryView: View {
         let overflow = max(0, clusterNames.count - Self.clusterLimit)
         HStack(spacing: -Space.sm) {
             ForEach(Array(shown.enumerated()), id: \.offset) { _, name in
-                SubscriptionMonogram(name: name, size: 28)
+                ServiceIcon(name: name, size: 28)
                     .overlay(Circle().stroke(Color(.systemBackground), lineWidth: 2))
             }
             if overflow > 0 {

@@ -101,14 +101,28 @@ struct ServiceCatalogTests {
     }
 
     @Test func uncoveredBrandsHaveNilIconAssetName() {
-        // Two catalog brands have no bundled logo and stay brand-color letter tiles: midjourney
-        // (stroke-only theSVG mark, unrasterizable without librsvg) and apple-one (a service bundle
-        // with no App Store app icon to source). Everything else resolves to a real icon.
-        let uncovered = ["midjourney", "apple-one"]
+        // apple-one is the sole catalog brand with no bundled logo — a service bundle with no App
+        // Store app icon to source, so it stays a brand-color letter tile. Everything else (including
+        // midjourney, now vendored from theSVG) resolves to a real icon.
+        let uncovered = ["apple-one"]
         for slug in uncovered {
             let brand = ServiceCatalog.brand(serviceKey: slug, name: "")
             #expect(brand?.iconAssetName == nil, "\(slug) has no bundled icon")
         }
+    }
+
+    @Test func logoMopUpBrandsResolveByKeyAndAlias() {
+        // The 11 brands added in the logo mop-up slice all resolve by explicit serviceKey.
+        let slugs = ["mgm-plus", "starz", "amc-plus", "lionsgate", "skyshowtime", "movistar-plus",
+                     "dazn", "filmin", "flixole", "atresplayer", "mitele"]
+        for slug in slugs {
+            #expect(ServiceCatalog.brand(serviceKey: slug, name: "") != nil, "\(slug) must resolve")
+        }
+        // A representative alias / display name from the batch resolves to the right brand.
+        #expect(ServiceCatalog.brand(serviceKey: nil, name: "Movistar")?.slug == "movistar-plus")
+        #expect(ServiceCatalog.brand(serviceKey: nil, name: "FlixOlé")?.slug == "flixole")
+        #expect(ServiceCatalog.brand(serviceKey: nil, name: "Antena3")?.slug == "atresplayer")
+        #expect(ServiceCatalog.brand(serviceKey: nil, name: "Lionsgate Play")?.slug == "lionsgate")
     }
 
     @Test func resolvesExtendedNamesByLongestPrefix() {

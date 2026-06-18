@@ -12,8 +12,8 @@ struct ServiceIconTests {
     }
 
     @Test func knownBrandWithoutLogoFallsBackToLetter() {
-        // midjourney is in the catalog but has no bundled logo (stroke-only mark, not vendored).
-        let p = ServiceIcon.presentation(serviceKey: "midjourney", name: "Midjourney")
+        // apple-one is in the catalog but has no bundled logo (service bundle, no App Store app icon).
+        let p = ServiceIcon.presentation(serviceKey: "apple-one", name: "Apple One")
         guard case .letter = p else {
             Issue.record("expected .letter, got \(p)"); return
         }
@@ -28,7 +28,7 @@ struct ServiceIconTests {
 
     @Test func letterForegroundIsBlackOrWhite() {
         // A no-logo catalog brand still renders a contrast-extreme letter on its tile.
-        let p = ServiceIcon.presentation(serviceKey: "midjourney", name: "Midjourney")
+        let p = ServiceIcon.presentation(serviceKey: "apple-one", name: "Apple One")
         guard case let .letter(_, foreground) = p else {
             Issue.record("expected .letter"); return
         }

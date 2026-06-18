@@ -10,7 +10,7 @@ struct SubscriptionDraft: Sendable, Equatable {
     var amount: String = ""
     var billingCycle: BillingCycle = .monthly
     var anchorDate: Date
-    var category: String = ""
+    var category: SubscriptionCategory = .other
     var paymentBrand: String = ""
     var paymentLast4: String = ""
     /// Stable identity of the chosen parent (or nil = standalone). Stored as an identifier,
@@ -26,7 +26,7 @@ struct SubscriptionDraft: Sendable, Equatable {
         amount: String = "",
         billingCycle: BillingCycle = .monthly,
         anchorDate: Date,
-        category: String = "",
+        category: SubscriptionCategory = .other,
         paymentBrand: String = "",
         paymentLast4: String = "",
         parentID: PersistentIdentifier? = nil,
@@ -52,7 +52,7 @@ struct SubscriptionDraft: Sendable, Equatable {
         amount = Self.amountString(sub.amount)
         billingCycle = sub.billingCycle
         anchorDate = sub.anchorDate
-        category = sub.category
+        category = sub.categoryKind
         paymentBrand = sub.paymentBrand ?? ""
         paymentLast4 = sub.paymentLast4 ?? ""
         parentID = sub.parent?.persistentModelID
@@ -84,7 +84,7 @@ struct SubscriptionDraft: Sendable, Equatable {
         if let amt = parsedAmount { sub.amount = amt }
         sub.billingCycle = billingCycle
         sub.anchorDate = anchorDate
-        sub.category = category.trimmingCharacters(in: .whitespacesAndNewlines)
+        sub.category = category.rawValue
         let brand = paymentBrand.trimmingCharacters(in: .whitespaces)
         let last4 = paymentLast4.trimmingCharacters(in: .whitespaces)
         sub.paymentBrand = brand.isEmpty ? nil : brand

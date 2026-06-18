@@ -33,7 +33,7 @@ enum ServiceCatalog {
         ServiceBrand(slug: "amazon-prime", displayName: "Amazon Prime", hex: "#00A8E1", iconAssetName: "amazon-prime", aliases: ["amazonprimevideo", "primevideo"]),
 
         // Streaming
-        ServiceBrand(slug: "hbo-max", displayName: "Max", hex: "#002BE7", iconAssetName: "hbo-max", aliases: ["max", "hbo"]),
+        ServiceBrand(slug: "hbo-max", displayName: "HBO Max", hex: "#002BE7", iconAssetName: "hbo-max", aliases: ["max", "hbo"]),
         ServiceBrand(slug: "hulu", displayName: "Hulu", hex: "#1CE783", iconAssetName: "hulu", aliases: []),
         ServiceBrand(slug: "apple-tv-plus", displayName: "Apple TV+", hex: "#000000", iconAssetName: "apple-tv-plus", aliases: ["appletv", "atv"]),
         ServiceBrand(slug: "paramount-plus", displayName: "Paramount+", hex: "#0064FF", iconAssetName: "paramount-plus", aliases: ["paramount"]),
@@ -65,7 +65,7 @@ enum ServiceCatalog {
         ServiceBrand(slug: "chatgpt", displayName: "ChatGPT", hex: "#10A37F", iconAssetName: "chatgpt", aliases: ["openai", "gpt", "gpt4", "openaichatgpt"]),
         ServiceBrand(slug: "claude", displayName: "Claude", hex: "#D97757", iconAssetName: "claude", aliases: ["anthropic", "claudeai"]),
         ServiceBrand(slug: "perplexity", displayName: "Perplexity", hex: "#20B2AA", iconAssetName: "perplexity", aliases: ["perplexityai"]),
-        ServiceBrand(slug: "midjourney", displayName: "Midjourney", hex: "#000000", iconAssetName: nil, aliases: ["mj"]),
+        ServiceBrand(slug: "midjourney", displayName: "Midjourney", hex: "#000000", iconAssetName: "midjourney", aliases: ["mj"]),
         ServiceBrand(slug: "github-copilot", displayName: "GitHub Copilot", hex: "#24292E", iconAssetName: "github-copilot", aliases: ["copilot", "ghcopilot"]),
         ServiceBrand(slug: "grok", displayName: "Grok", hex: "#000000", iconAssetName: "grok", aliases: ["xai", "grokai"]),
         ServiceBrand(slug: "cursor", displayName: "Cursor", hex: "#000000", iconAssetName: "cursor", aliases: ["cursorai", "anysphere"]),
@@ -116,6 +116,21 @@ enum ServiceCatalog {
         ServiceBrand(slug: "apple-one", displayName: "Apple One", hex: "#000000", iconAssetName: nil, aliases: []),
         ServiceBrand(slug: "apple-news", displayName: "Apple News+", hex: "#FA2D48", iconAssetName: "apple-news", aliases: ["applenewsplus"]),
         ServiceBrand(slug: "apple-fitness", displayName: "Apple Fitness+", hex: "#30D158", iconAssetName: "apple-fitness", aliases: ["fitnessplus"]),
+
+        // Streaming — Prime Video channels (logo mop-up)
+        ServiceBrand(slug: "mgm-plus", displayName: "MGM+", hex: "#0B0B0B", iconAssetName: "mgm-plus", aliases: ["mgm", "epix"]),
+        ServiceBrand(slug: "starz", displayName: "STARZ", hex: "#000000", iconAssetName: "starz", aliases: ["starzplay"]),
+        ServiceBrand(slug: "amc-plus", displayName: "AMC+", hex: "#0A0A0A", iconAssetName: "amc-plus", aliases: ["amc"]),
+        ServiceBrand(slug: "lionsgate", displayName: "Lionsgate", hex: "#0B0B0B", iconAssetName: "lionsgate", aliases: ["lionsgateplay", "lionsgateplus", "lgplay"]),
+
+        // Streaming — Spain & Europe (logo mop-up)
+        ServiceBrand(slug: "skyshowtime", displayName: "SkyShowtime", hex: "#0E0E2C", iconAssetName: "skyshowtime", aliases: []),
+        ServiceBrand(slug: "movistar-plus", displayName: "Movistar Plus+", hex: "#019DF4", iconAssetName: "movistar-plus", aliases: ["movistar", "yomvi"]),
+        ServiceBrand(slug: "dazn", displayName: "DAZN", hex: "#0F0F0F", iconAssetName: "dazn", aliases: []),
+        ServiceBrand(slug: "filmin", displayName: "Filmin", hex: "#E8482B", iconAssetName: "filmin", aliases: []),
+        ServiceBrand(slug: "flixole", displayName: "FlixOlé", hex: "#D81E27", iconAssetName: "flixole", aliases: ["flixolé"]),
+        ServiceBrand(slug: "atresplayer", displayName: "atresplayer", hex: "#FF6C0E", iconAssetName: "atresplayer", aliases: ["a3player", "antena3", "atresmedia"]),
+        ServiceBrand(slug: "mitele", displayName: "Mitele", hex: "#0A47A9", iconAssetName: "mitele", aliases: ["miteleplus", "mediaset", "mediasetinfinity"]),
     ]
 
     /// Lowercase and strip every non-alphanumeric character. "Disney+" → "disney",

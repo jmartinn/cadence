@@ -33,7 +33,7 @@ public enum SubscriptionCategory: String, Codable, CaseIterable, Sendable {
         case .music: return "music.note"
         case .news: return "newspaper"
         case .productivity: return "checklist"
-        case .developerTools: return "chevron.left.forward.slash.chevron.right"
+        case .developerTools: return "chevron.left.slash.chevron.right"
         case .utilities: return "wrench.and.screwdriver"
         case .shopping: return "cart"
         case .healthAndFitness: return "heart"

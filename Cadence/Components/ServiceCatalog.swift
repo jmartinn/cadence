@@ -104,6 +104,7 @@ enum ServiceCatalog {
         ServiceBrand(slug: "supabase", displayName: "Supabase", hex: "#3FCF8E", iconAssetName: "supabase", aliases: []),
         ServiceBrand(slug: "raycast", displayName: "Raycast", hex: "#FF6363", iconAssetName: "raycast", aliases: ["raycastpro"]),
         ServiceBrand(slug: "obsidian", displayName: "Obsidian", hex: "#7C3AED", iconAssetName: "obsidian", aliases: ["obsidianmd", "obsidiansync"]),
+        ServiceBrand(slug: "nextdns", displayName: "NextDNS", hex: "#3D7BF7", iconAssetName: "nextdns", aliases: []),
 
         // AI (catalog-widening)
         ServiceBrand(slug: "elevenlabs", displayName: "ElevenLabs", hex: "#000000", iconAssetName: "elevenlabs", aliases: ["11labs"]),

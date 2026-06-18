@@ -49,7 +49,7 @@ struct ServiceCatalogTests {
     @Test func catalogWideningBrandsResolveByKeyAndAlias() {
         // The 17 brands added in the catalog-widening slice all resolve by explicit serviceKey.
         let slugs = ["telegram", "x", "reddit", "linkedin", "patreon", "snapchat",
-                     "vercel", "supabase", "raycast", "obsidian",
+                     "vercel", "supabase", "raycast", "obsidian", "nextdns",
                      "elevenlabs", "gemini", "v0",
                      "apple-arcade", "apple-one", "apple-news", "apple-fitness"]
         for slug in slugs {

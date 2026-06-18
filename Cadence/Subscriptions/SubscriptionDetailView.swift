@@ -111,7 +111,8 @@ struct SubscriptionDetailView: View {
             if let parent = subscription.parent {
                 Divider().padding(.leading, Space.lg)
                 NavigationLink(value: parent) {
-                    InfoRow(systemImage: "square.stack.3d.up", label: "Part of", value: parent.name)
+                    InfoRow(systemImage: "square.stack.3d.up", label: "Part of",
+                            value: parent.name, showsChevron: true)
                 }
                 .buttonStyle(.plain)
             }

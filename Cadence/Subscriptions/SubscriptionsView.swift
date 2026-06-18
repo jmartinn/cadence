@@ -58,14 +58,17 @@ struct SubscriptionsView: View {
             .sheet(isPresented: $showingAdd) {
                 SubscriptionFormView(mode: .add)
             }
-            #if DEBUG
             .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button { seedSampleData() } label: { Image(systemName: "ladybug") }
-                            .accessibilityLabel("Seed sample data")
-                    }
+                ToolbarItem(placement: .topBarTrailing) {
+                    if !subscriptions.isEmpty { sortMenu }
                 }
-            #endif
+                #if DEBUG
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { seedSampleData() } label: { Image(systemName: "ladybug") }
+                        .accessibilityLabel("Seed sample data")
+                }
+                #endif
+            }
         }
     }
 
@@ -77,7 +80,6 @@ struct SubscriptionsView: View {
                     yearly: forecaster.yearlyTotal,
                     title: effectiveFilter?.displayName
                 )
-                sortControl
                 filterControl
                 LazyVStack(spacing: Space.md) {
                     ForEach(visibleSubscriptions) { sub in
@@ -118,22 +120,24 @@ struct SubscriptionsView: View {
         .buttonStyle(.plain)
     }
 
-    private var sortControl: some View {
-        HStack(spacing: Space.sm) {
-            Text("Sort by")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-            ForEach(SubscriptionSort.allCases) { option in
-                pill(option.title, isSelected: sort == option) { sort = option }
+    /// Sort options as a navigation-bar pull-down menu (HIG's canonical "Sort by" pull-down),
+    /// replacing the inline pill row so the Filter row is the only on-screen control.
+    private var sortMenu: some View {
+        Menu {
+            Picker("Sort by", selection: $sort) {
+                ForEach(SubscriptionSort.allCases) { option in
+                    Text(option.title).tag(option)
+                }
             }
-            Spacer(minLength: 0)
+        } label: {
+            Label("Sort by", systemImage: "arrow.up.arrow.down")
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityLabel("Sort by")
     }
 
     /// Capsule filter row: "All" + one chip per populated category, in canonical order.
     /// Rendered only when there are at least two categories to choose between; horizontally
-    /// scrolls because the category set can be long. Mirrors `sortControl`'s styling.
+    /// scrolls because the category set can be long. Chips use the shared `pill` styling.
     @ViewBuilder private var filterControl: some View {
         if SubscriptionListPresenter.shouldOfferFilter(in: subscriptions) {
             ScrollView(.horizontal, showsIndicators: false) {

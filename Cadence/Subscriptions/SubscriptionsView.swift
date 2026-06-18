@@ -4,7 +4,7 @@ import SwiftUI
 
 /// The Subscriptions tab — Cadence's first real screen. Reads subscriptions reactively via
 /// `@Query`, derives display order with `SubscriptionListPresenter`, and totals with `Forecaster`.
-/// MV architecture: the only mutable state is the selected sort mode.
+/// MV architecture: the mutable state is the selected sort mode and category filter.
 struct SubscriptionsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Subscription.name) private var subscriptions: [Subscription]
@@ -135,7 +135,7 @@ struct SubscriptionsView: View {
     /// Rendered only when there are at least two categories to choose between; horizontally
     /// scrolls because the category set can be long. Mirrors `sortControl`'s styling.
     @ViewBuilder private var filterControl: some View {
-        if availableCategories.count >= 2 {
+        if SubscriptionListPresenter.shouldOfferFilter(in: subscriptions) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: Space.sm) {
                     Text("Filter")

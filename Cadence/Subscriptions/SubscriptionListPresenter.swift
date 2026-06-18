@@ -90,6 +90,12 @@ enum SubscriptionListPresenter {
         return SubscriptionCategory.allCases.filter { present.contains($0) }
     }
 
+    /// Whether the category filter row should be offered: only when subscriptions span at least
+    /// two categories (with a single bucket there is nothing to narrow). Mirrors the row's gate.
+    static func shouldOfferFilter(in subs: [Subscription]) -> Bool {
+        availableCategories(in: subs).count >= 2
+    }
+
     /// Subscriptions kept by category. `nil` (All) returns `subs` unchanged; a non-nil category
     /// keeps only those whose `categoryKind` matches. Order is preserved — callers sort afterward.
     static func filtered(_ subs: [Subscription], by category: SubscriptionCategory?) -> [Subscription] {

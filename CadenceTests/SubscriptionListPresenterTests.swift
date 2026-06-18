@@ -203,4 +203,40 @@ struct SubscriptionListPresenterTests {
         // Selection no longer present (e.g. its last subscription was deleted) -> All.
         #expect(SubscriptionListPresenter.effectiveCategory(.gaming, among: available) == nil)
     }
+
+    @Test func shouldOfferFilterRequiresAtLeastTwoCategories() {
+        let context = ModelContext(container)
+        // No subs -> nothing to filter.
+        #expect(SubscriptionListPresenter.shouldOfferFilter(in: []) == false)
+
+        // Two subs in the SAME category -> still one bucket, no filter.
+        makeCategorized("Netflix", .entertainment, in: context)
+        makeCategorized("Max", .entertainment, in: context)
+        var subs = try! context.fetch(FetchDescriptor<Subscription>())
+        #expect(SubscriptionListPresenter.shouldOfferFilter(in: subs) == false)
+
+        // A second category appears -> filter becomes worthwhile.
+        makeCategorized("Spotify", .music, in: context)
+        subs = try! context.fetch(FetchDescriptor<Subscription>())
+        #expect(SubscriptionListPresenter.shouldOfferFilter(in: subs) == true)
+    }
+
+    @Test func effectiveCategoryFallsBackAfterSelectedCategoryEmptied() {
+        let context = ModelContext(container)
+        let onlyGaming = makeCategorized("Xbox", .gaming, in: context)
+        makeCategorized("Netflix", .entertainment, in: context)
+
+        // User selected .gaming while it was populated -> selection survives.
+        var subs = try! context.fetch(FetchDescriptor<Subscription>())
+        var available = SubscriptionListPresenter.availableCategories(in: subs)
+        #expect(SubscriptionListPresenter.effectiveCategory(.gaming, among: available) == .gaming)
+
+        // Its last subscription is removed -> the category leaves the available set and the
+        // selection falls back to All (nil), so the list/card never strand on an empty filter.
+        context.delete(onlyGaming)
+        subs = try! context.fetch(FetchDescriptor<Subscription>())
+        available = SubscriptionListPresenter.availableCategories(in: subs)
+        #expect(!available.contains(.gaming))
+        #expect(SubscriptionListPresenter.effectiveCategory(.gaming, among: available) == nil)
+    }
 }

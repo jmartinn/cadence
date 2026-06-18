@@ -5,12 +5,24 @@ import SwiftUI
 struct SubscriptionSummaryCard: View {
     let monthly: Decimal
     let yearly: Decimal
+    /// Optional context label shown above the totals (e.g. the active category name).
+    /// `nil` renders the card exactly as before — just the two totals.
+    var title: String? = nil
 
     var body: some View {
-        HStack(spacing: 0) {
-            half(label: "Per month", amount: monthly)
-            Divider().frame(height: 40)
-            half(label: "Per year", amount: yearly)
+        VStack(spacing: Space.sm) {
+            if let title {
+                Text(title)
+                    .font(.footnote.weight(.semibold))
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, Space.lg)
+            }
+            HStack(spacing: 0) {
+                half(label: "Per month", amount: monthly)
+                Divider().frame(height: 40)
+                half(label: "Per year", amount: yearly)
+            }
         }
         .padding(.vertical, Space.lg)
         .frame(maxWidth: .infinity)
@@ -34,6 +46,16 @@ struct SubscriptionSummaryCard: View {
     SubscriptionSummaryCard(
         monthly: Decimal(string: "90.94")!,
         yearly: Decimal(string: "1091.28")!
+    )
+    .padding()
+    .background(Color(.systemGroupedBackground))
+}
+
+#Preview("Filtered") {
+    SubscriptionSummaryCard(
+        monthly: Decimal(string: "40.00")!,
+        yearly: Decimal(string: "480.00")!,
+        title: "Entertainment"
     )
     .padding()
     .background(Color(.systemGroupedBackground))

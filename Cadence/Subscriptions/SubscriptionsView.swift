@@ -4,24 +4,38 @@ import SwiftUI
 
 /// The Subscriptions tab — Cadence's first real screen. Reads subscriptions reactively via
 /// `@Query`, derives display order with `SubscriptionListPresenter`, and totals with `Forecaster`.
-/// MV architecture: the only mutable state is the selected sort mode.
+/// MV architecture: the mutable state is the selected sort mode and category filter.
 struct SubscriptionsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Subscription.name) private var subscriptions: [Subscription]
     @State private var sort: SubscriptionSort = .nextCharge
+    @State private var categoryFilter: SubscriptionCategory? = nil
     @State private var showingAdd = false
 
     private var today: Date { .now }
     private var calendar: Calendar { .current }
 
-    private var orderedSubscriptions: [Subscription] {
-        SubscriptionListPresenter.sorted(subscriptions, by: sort, today: today, calendar: calendar)
+    private var availableCategories: [SubscriptionCategory] {
+        SubscriptionListPresenter.availableCategories(in: subscriptions)
+    }
+
+    private var effectiveFilter: SubscriptionCategory? {
+        SubscriptionListPresenter.effectiveCategory(categoryFilter, among: availableCategories)
+    }
+
+    private var filteredSubscriptions: [Subscription] {
+        SubscriptionListPresenter.filtered(subscriptions, by: effectiveFilter)
+    }
+
+    private var visibleSubscriptions: [Subscription] {
+        SubscriptionListPresenter.sorted(filteredSubscriptions, by: sort, today: today, calendar: calendar)
     }
 
     private var forecaster: Forecaster {
         // Totals are anchor-independent and filter to `.active` internally, so a neutral
-        // (0, .distantPast) anchor is purely a constructor requirement.
-        Forecaster(anchorBalance: 0, asOfDate: .distantPast, subscriptions: subscriptions.map(\.plan))
+        // (0, .distantPast) anchor is purely a constructor requirement. Built from the filtered
+        // set so the summary card follows the active category filter.
+        Forecaster(anchorBalance: 0, asOfDate: .distantPast, subscriptions: filteredSubscriptions.map(\.plan))
     }
 
     var body: some View {
@@ -44,14 +58,17 @@ struct SubscriptionsView: View {
             .sheet(isPresented: $showingAdd) {
                 SubscriptionFormView(mode: .add)
             }
-            #if DEBUG
             .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button { seedSampleData() } label: { Image(systemName: "ladybug") }
-                            .accessibilityLabel("Seed sample data")
-                    }
+                ToolbarItem(placement: .topBarTrailing) {
+                    if !subscriptions.isEmpty { sortMenu }
                 }
-            #endif
+                #if DEBUG
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { seedSampleData() } label: { Image(systemName: "ladybug") }
+                        .accessibilityLabel("Seed sample data")
+                }
+                #endif
+            }
         }
     }
 
@@ -60,11 +77,12 @@ struct SubscriptionsView: View {
             VStack(spacing: Space.lg) {
                 SubscriptionSummaryCard(
                     monthly: forecaster.monthlyTotal,
-                    yearly: forecaster.yearlyTotal
+                    yearly: forecaster.yearlyTotal,
+                    title: effectiveFilter?.displayName
                 )
-                sortControl
+                filterControl
                 LazyVStack(spacing: Space.md) {
-                    ForEach(orderedSubscriptions) { sub in
+                    ForEach(visibleSubscriptions) { sub in
                         NavigationLink(value: sub) {
                             SubscriptionRow(
                                 subscription: sub,
@@ -88,28 +106,54 @@ struct SubscriptionsView: View {
         }
     }
 
-    private var sortControl: some View {
-        HStack(spacing: Space.sm) {
-            Text("Sort by")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-            ForEach(SubscriptionSort.allCases) { option in
-                Button {
-                    sort = option
-                } label: {
-                    Text(option.title)
-                        .font(.system(size: 13, weight: .semibold))
-                        .padding(.horizontal, Space.md)
-                        .padding(.vertical, Space.sm)
-                        .background(sort == option ? Color.primary : Color(.tertiarySystemFill))
-                        .foregroundColor(sort == option ? Color(.systemBackground) : .secondary)
-                        .clipShape(Capsule())
-                }
-                .buttonStyle(.plain)
-            }
-            Spacer(minLength: 0)
+    /// One capsule pill, shared by the Sort and Filter rows so they stay visually identical.
+    private func pill(_ title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 13, weight: .semibold))
+                .padding(.horizontal, Space.md)
+                .padding(.vertical, Space.sm)
+                .background(isSelected ? Color.primary : Color(.tertiarySystemFill))
+                .foregroundColor(isSelected ? Color(.systemBackground) : .secondary)
+                .clipShape(Capsule())
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .buttonStyle(.plain)
+    }
+
+    /// Sort options as a navigation-bar pull-down menu (HIG's canonical "Sort by" pull-down),
+    /// replacing the inline pill row so the Filter row is the only on-screen control.
+    private var sortMenu: some View {
+        Menu {
+            Picker("Sort by", selection: $sort) {
+                ForEach(SubscriptionSort.allCases) { option in
+                    Text(option.title).tag(option)
+                }
+            }
+        } label: {
+            Label("Sort by", systemImage: "arrow.up.arrow.down")
+        }
+        .accessibilityLabel("Sort by")
+    }
+
+    /// Capsule filter row: "All" + one chip per populated category, in canonical order.
+    /// Rendered only when there are at least two categories to choose between; horizontally
+    /// scrolls because the category set can be long. Chips use the shared `pill` styling.
+    @ViewBuilder private var filterControl: some View {
+        if SubscriptionListPresenter.shouldOfferFilter(in: subscriptions) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: Space.sm) {
+                    Text("Filter")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    pill("All", isSelected: effectiveFilter == nil) { categoryFilter = nil }
+                    ForEach(availableCategories, id: \.self) { category in
+                        pill(category.displayName, isSelected: effectiveFilter == category) {
+                            categoryFilter = category
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private var emptyState: some View {

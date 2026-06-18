@@ -7,7 +7,7 @@ struct SubscriptionDraftTests {
     private func baseDraft() -> SubscriptionDraft {
         SubscriptionDraft(
             name: "Netflix", amount: "17.99", billingCycle: .monthly,
-            anchorDate: Date(timeIntervalSince1970: 0), category: "Entertainment",
+            anchorDate: Date(timeIntervalSince1970: 0), category: .entertainment,
             paymentBrand: "Visa", paymentLast4: "4821"
         )
     }
@@ -69,5 +69,28 @@ struct SubscriptionDraftTests {
         blankPay.apply(to: dest, parent: nil)
         #expect(dest.paymentBrand == nil)
         #expect(dest.paymentLast4 == nil)
+    }
+
+    @Test func emptyDraftDefaultsToOtherCategory() {
+        #expect(SubscriptionDraft.empty(now: Date(timeIntervalSince1970: 0)).category == .other)
+    }
+
+    @Test func initFromModelCoercesCategory() {
+        let known = Subscription(name: "N", amount: Decimal(string: "1.00")!, billingCycle: .monthly,
+                                 anchorDate: .distantPast, category: "Music")
+        #expect(SubscriptionDraft(from: known).category == .music)
+
+        let unknown = Subscription(name: "N", amount: Decimal(string: "1.00")!, billingCycle: .monthly,
+                                   anchorDate: .distantPast, category: "Streaming")
+        #expect(SubscriptionDraft(from: unknown).category == .other)
+    }
+
+    @Test func applyWritesCategoryRawValue() {
+        var d = baseDraft()
+        d.category = .developerTools
+        let dest = Subscription(name: "", amount: 0, billingCycle: .monthly,
+                                anchorDate: .distantPast, category: "")
+        d.apply(to: dest, parent: nil)
+        #expect(dest.category == "Developer Tools")
     }
 }

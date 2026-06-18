@@ -105,7 +105,9 @@ struct SubscriptionDetailView: View {
             Divider().padding(.leading, Space.lg)
             InfoRow(systemImage: "calendar", label: "Next charge", value: nextChargeText)
             Divider().padding(.leading, Space.lg)
-            InfoRow(systemImage: "tag", label: "Category", value: subscription.category)
+            InfoRow(systemImage: subscription.categoryKind.systemImage,
+                    label: "Category",
+                    value: subscription.categoryKind.displayName)
             if let parent = subscription.parent {
                 Divider().padding(.leading, Space.lg)
                 NavigationLink(value: parent) {

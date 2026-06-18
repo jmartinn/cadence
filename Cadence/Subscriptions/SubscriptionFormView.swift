@@ -56,7 +56,12 @@ struct SubscriptionFormView: View {
                         Text("Yearly").tag(BillingCycle.yearly)
                     }
                     DatePicker("First charge", selection: $draft.anchorDate, displayedComponents: .date)
-                    TextField("Category", text: $draft.category)
+                    Picker("Category", selection: $draft.category) {
+                        ForEach(SubscriptionCategory.allCases, id: \.self) { category in
+                            Label(category.displayName, systemImage: category.systemImage)
+                                .tag(category)
+                        }
+                    }
                 }
                 Section("Payment method") {
                     TextField("Card brand (e.g. Visa)", text: $draft.paymentBrand)

@@ -83,6 +83,31 @@ enum SubscriptionListPresenter {
             .reduce(Decimal(0)) { $0 + $1.plan.normalizedMonthlyAmount }
     }
 
+    /// Distinct categories present among `subs` (read via `categoryKind`), returned in canonical
+    /// `SubscriptionCategory.allCases` order. Drives the filter chip row; empty when `subs` is empty.
+    static func availableCategories(in subs: [Subscription]) -> [SubscriptionCategory] {
+        let present = Set(subs.map(\.categoryKind))
+        return SubscriptionCategory.allCases.filter { present.contains($0) }
+    }
+
+    /// Subscriptions kept by category. `nil` (All) returns `subs` unchanged; a non-nil category
+    /// keeps only those whose `categoryKind` matches. Order is preserved — callers sort afterward.
+    static func filtered(_ subs: [Subscription], by category: SubscriptionCategory?) -> [Subscription] {
+        guard let category else { return subs }
+        return subs.filter { $0.categoryKind == category }
+    }
+
+    /// Resolve the user's selected filter against what is actually present: keep the selection only
+    /// if that category still has subscriptions, otherwise fall back to All (`nil`). Prevents a
+    /// stranded filter when the last subscription in a category is removed while it is selected.
+    static func effectiveCategory(
+        _ selected: SubscriptionCategory?,
+        among available: [SubscriptionCategory]
+    ) -> SubscriptionCategory? {
+        guard let selected, available.contains(selected) else { return nil }
+        return selected
+    }
+
     /// Localized case-insensitive A→Z tiebreaker.
     private static func byName(_ a: Subscription, _ b: Subscription) -> Bool {
         a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending

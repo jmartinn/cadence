@@ -105,4 +105,102 @@ struct SubscriptionListPresenterTests {
             #expect(result.isEmpty)
         }
     }
+
+    /// Insert an active monthly subscription with a specific category (fixed amount/anchor —
+    /// these tests only care about category and name).
+    @discardableResult
+    private func makeCategorized(
+        _ name: String,
+        _ category: SubscriptionCategory,
+        in context: ModelContext
+    ) -> Subscription {
+        let sub = Subscription(
+            name: name,
+            amount: Decimal(string: "9.99")!,
+            billingCycle: .monthly,
+            anchorDate: date(2026, 1, 1),
+            status: .active,
+            category: category.rawValue
+        )
+        context.insert(sub)
+        return sub
+    }
+
+    @Test func availableCategoriesAreDistinctAndCanonicallyOrdered() {
+        let context = ModelContext(container)
+        // Inserted out of canonical order, with a duplicate category.
+        makeCategorized("Claude", .productivity, in: context) // allCases index 3
+        makeCategorized("Netflix", .entertainment, in: context) // allCases index 0
+        makeCategorized("Max", .entertainment, in: context) // duplicate of entertainment
+        makeCategorized("Spotify", .music, in: context) // allCases index 1
+
+        let subs = try! context.fetch(FetchDescriptor<Subscription>())
+        let cats = SubscriptionListPresenter.availableCategories(in: subs)
+
+        #expect(cats == [.entertainment, .music, .productivity])
+    }
+
+    @Test func availableCategoriesIsEmptyForNoSubs() {
+        #expect(SubscriptionListPresenter.availableCategories(in: []).isEmpty)
+    }
+
+    @Test func filteredByNilReturnsInputUnchanged() {
+        let context = ModelContext(container)
+        makeCategorized("Netflix", .entertainment, in: context)
+        makeCategorized("Spotify", .music, in: context)
+
+        let subs = try! context.fetch(FetchDescriptor<Subscription>())
+        let result = SubscriptionListPresenter.filtered(subs, by: nil)
+
+        #expect(result.count == subs.count)
+        #expect(Set(result.map(\.name)) == Set(subs.map(\.name)))
+    }
+
+    @Test func filteredByCategoryKeepsOnlyMatches() {
+        let context = ModelContext(container)
+        makeCategorized("Netflix", .entertainment, in: context)
+        makeCategorized("Max", .entertainment, in: context)
+        makeCategorized("Spotify", .music, in: context)
+
+        let subs = try! context.fetch(FetchDescriptor<Subscription>())
+        let result = SubscriptionListPresenter.filtered(subs, by: .entertainment)
+
+        #expect(Set(result.map(\.name)) == ["Netflix", "Max"])
+    }
+
+    @Test func filteredCoercesUnknownStoredCategoryToOther() {
+        let context = ModelContext(container)
+        // A raw stored string outside the enum coerces to .other via `categoryKind`.
+        let legacy = Subscription(
+            name: "Legacy", amount: Decimal(string: "1.00")!, billingCycle: .monthly,
+            anchorDate: date(2026, 1, 1), status: .active, category: "Wat"
+        )
+        context.insert(legacy)
+
+        let subs = try! context.fetch(FetchDescriptor<Subscription>())
+        let result = SubscriptionListPresenter.filtered(subs, by: .other)
+
+        #expect(result.map(\.name) == ["Legacy"])
+    }
+
+    @Test func filterThenSortYieldsOrderedSubset() {
+        let context = ModelContext(container)
+        makeCategorized("Zeta", .entertainment, in: context)
+        makeCategorized("Alpha", .entertainment, in: context)
+        makeCategorized("Spotify", .music, in: context)
+
+        let subs = try! context.fetch(FetchDescriptor<Subscription>())
+        let filtered = SubscriptionListPresenter.filtered(subs, by: .entertainment)
+        let sorted = SubscriptionListPresenter.sorted(filtered, by: .name, today: today, calendar: utc)
+
+        #expect(sorted.map(\.name) == ["Alpha", "Zeta"])
+    }
+
+    @Test func effectiveCategoryKeepsValidSelectionElseFallsBackToAll() {
+        let available: [SubscriptionCategory] = [.entertainment, .music]
+        #expect(SubscriptionListPresenter.effectiveCategory(nil, among: available) == nil)
+        #expect(SubscriptionListPresenter.effectiveCategory(.music, among: available) == .music)
+        // Selection no longer present (e.g. its last subscription was deleted) -> All.
+        #expect(SubscriptionListPresenter.effectiveCategory(.gaming, among: available) == nil)
+    }
 }

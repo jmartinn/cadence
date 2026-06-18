@@ -46,6 +46,22 @@ struct ServiceCatalogTests {
         }
     }
 
+    @Test func catalogWideningBrandsResolveByKeyAndAlias() {
+        // The 17 brands added in the catalog-widening slice all resolve by explicit serviceKey.
+        let slugs = ["telegram", "x", "reddit", "linkedin", "patreon", "snapchat",
+                     "vercel", "supabase", "raycast", "obsidian", "nextdns",
+                     "elevenlabs", "gemini", "v0",
+                     "apple-arcade", "apple-one", "apple-news", "apple-fitness"]
+        for slug in slugs {
+            #expect(ServiceCatalog.brand(serviceKey: slug, name: "") != nil, "\(slug) must resolve")
+        }
+        // A representative alias / display name from each sourcing group resolves to the right brand.
+        #expect(ServiceCatalog.brand(serviceKey: nil, name: "Twitter")?.slug == "x")
+        #expect(ServiceCatalog.brand(serviceKey: nil, name: "Snapchat+")?.slug == "snapchat")
+        #expect(ServiceCatalog.brand(serviceKey: nil, name: "Bard")?.slug == "gemini")
+        #expect(ServiceCatalog.brand(serviceKey: nil, name: "Apple News")?.slug == "apple-news")
+    }
+
     @Test func everySlugIsUnique() {
         let slugs = ServiceCatalog.all.map(\.slug)
         #expect(Set(slugs).count == slugs.count, "duplicate slug in catalog")
@@ -85,10 +101,10 @@ struct ServiceCatalogTests {
     }
 
     @Test func uncoveredBrandsHaveNilIconAssetName() {
-        // midjourney has no bundled logo: its theSVG mark is stroke-only and can't be rasterized
-        // without librsvg, so it stays a brand-color letter tile. icloud/cursor/github-copilot now
-        // carry bundled logos. Everything else resolves to a real icon.
-        let uncovered = ["midjourney"]
+        // Two catalog brands have no bundled logo and stay brand-color letter tiles: midjourney
+        // (stroke-only theSVG mark, unrasterizable without librsvg) and apple-one (a service bundle
+        // with no App Store app icon to source). Everything else resolves to a real icon.
+        let uncovered = ["midjourney", "apple-one"]
         for slug in uncovered {
             let brand = ServiceCatalog.brand(serviceKey: slug, name: "")
             #expect(brand?.iconAssetName == nil, "\(slug) has no bundled icon")

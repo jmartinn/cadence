@@ -90,6 +90,32 @@ enum ServiceCatalog {
 
         // Social & Community
         ServiceBrand(slug: "discord", displayName: "Discord", hex: "#5865F2", iconAssetName: "discord", aliases: []),
+
+        // Social & Community (catalog-widening)
+        ServiceBrand(slug: "telegram", displayName: "Telegram", hex: "#26A5E4", iconAssetName: "telegram", aliases: ["telegrampremium"]),
+        ServiceBrand(slug: "x", displayName: "X", hex: "#000000", iconAssetName: "x", aliases: ["twitter", "xpremium", "twitterblue"]),
+        ServiceBrand(slug: "reddit", displayName: "Reddit", hex: "#FF4500", iconAssetName: "reddit", aliases: ["redditpremium"]),
+        ServiceBrand(slug: "linkedin", displayName: "LinkedIn", hex: "#0A66C2", iconAssetName: "linkedin", aliases: ["linkedinpremium"]),
+        ServiceBrand(slug: "patreon", displayName: "Patreon", hex: "#FF424D", iconAssetName: "patreon", aliases: []),
+        ServiceBrand(slug: "snapchat", displayName: "Snapchat", hex: "#FFFC00", iconAssetName: "snapchat", aliases: ["snapchatplus", "snap"]),
+
+        // Developer Tools
+        ServiceBrand(slug: "vercel", displayName: "Vercel", hex: "#000000", iconAssetName: "vercel", aliases: []),
+        ServiceBrand(slug: "supabase", displayName: "Supabase", hex: "#3FCF8E", iconAssetName: "supabase", aliases: []),
+        ServiceBrand(slug: "raycast", displayName: "Raycast", hex: "#FF6363", iconAssetName: "raycast", aliases: ["raycastpro"]),
+        ServiceBrand(slug: "obsidian", displayName: "Obsidian", hex: "#7C3AED", iconAssetName: "obsidian", aliases: ["obsidianmd", "obsidiansync"]),
+        ServiceBrand(slug: "nextdns", displayName: "NextDNS", hex: "#3D7BF7", iconAssetName: "nextdns", aliases: []),
+
+        // AI (catalog-widening)
+        ServiceBrand(slug: "elevenlabs", displayName: "ElevenLabs", hex: "#000000", iconAssetName: "elevenlabs", aliases: ["11labs"]),
+        ServiceBrand(slug: "gemini", displayName: "Gemini", hex: "#1C69FF", iconAssetName: "gemini", aliases: ["googlegemini", "geminiadvanced", "bard"]),
+        ServiceBrand(slug: "v0", displayName: "v0", hex: "#000000", iconAssetName: "v0", aliases: ["v0dev", "vercelv0"]),
+
+        // Apple Services & ecosystem
+        ServiceBrand(slug: "apple-arcade", displayName: "Apple Arcade", hex: "#000000", iconAssetName: "apple-arcade", aliases: ["arcade"]),
+        ServiceBrand(slug: "apple-one", displayName: "Apple One", hex: "#000000", iconAssetName: nil, aliases: []),
+        ServiceBrand(slug: "apple-news", displayName: "Apple News+", hex: "#FA2D48", iconAssetName: "apple-news", aliases: ["applenewsplus"]),
+        ServiceBrand(slug: "apple-fitness", displayName: "Apple Fitness+", hex: "#30D158", iconAssetName: "apple-fitness", aliases: ["fitnessplus"]),
     ]
 
     /// Lowercase and strip every non-alphanumeric character. "Disney+" → "disney",

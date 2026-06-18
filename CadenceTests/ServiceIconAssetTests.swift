@@ -14,6 +14,6 @@ struct ServiceIconAssetTests {
 
     @Test func coverageDoesNotRegressBelowFloor() {
         let covered = ServiceCatalog.all.filter { $0.iconAssetName != nil }.count
-        #expect(covered >= 51, "logo coverage regressed below the current floor (51); got \(covered)")
+        #expect(covered >= 68, "logo coverage regressed below the current floor (68); got \(covered)")
     }
 }

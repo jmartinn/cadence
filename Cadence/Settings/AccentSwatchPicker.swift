@@ -16,7 +16,7 @@ struct AccentSwatchPicker: View {
                             .overlay {
                                 Image(systemName: "checkmark")
                                     .font(.system(size: 13, weight: .bold))
-                                    .foregroundStyle(.white)
+                                    .foregroundStyle(theme == .graphite ? Color(.systemBackground) : .white)
                                     .opacity(theme == selection ? 1 : 0)
                             }
                             .overlay {
@@ -24,14 +24,14 @@ struct AccentSwatchPicker: View {
                                     .stroke(Color.primary, lineWidth: theme == selection ? 2 : 0)
                                     .padding(-3)
                             }
-                            .padding(3) // keep the selection ring from clipping
+                            .padding(4) // keep the selection ring from clipping
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(theme.displayName)
                     .accessibilityAddTraits(theme == selection ? [.isButton, .isSelected] : .isButton)
                 }
             }
-            .padding(.vertical, Space.sm)
+            .padding(Space.sm)
         }
     }
 }

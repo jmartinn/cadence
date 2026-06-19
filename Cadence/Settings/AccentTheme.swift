@@ -5,15 +5,16 @@ import SwiftUI
 /// for free. The `rawValue` strings are a persistence contract (stored in `@AppStorage`) —
 /// never change them, or saved preferences break.
 enum AccentTheme: String, CaseIterable, Identifiable {
-    case blue, indigo, purple, pink, red, orange, green, teal
+    case graphite, blue, indigo, purple, pink, red, orange, green, teal
 
     /// The accent used until the user picks one. Matches the iOS-native blue accent.
-    static let `default`: AccentTheme = .blue
+    static let `default`: AccentTheme = .graphite
 
     var id: String { rawValue }
 
     var color: Color {
         switch self {
+        case .graphite: .primary
         case .blue: .blue
         case .indigo: .indigo
         case .purple: .purple
@@ -27,6 +28,7 @@ enum AccentTheme: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
+        case .graphite: "Graphite"
         case .blue: "Blue"
         case .indigo: "Indigo"
         case .purple: "Purple"

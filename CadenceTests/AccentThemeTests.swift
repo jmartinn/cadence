@@ -12,6 +12,7 @@ struct AccentThemeTests {
 
     /// The persistence contract: these strings are stored in @AppStorage and must never change.
     @Test func rawValuesAreStable() {
+        #expect(AccentTheme.graphite.rawValue == "graphite")
         #expect(AccentTheme.blue.rawValue == "blue")
         #expect(AccentTheme.indigo.rawValue == "indigo")
         #expect(AccentTheme.purple.rawValue == "purple")
@@ -32,9 +33,9 @@ struct AccentThemeTests {
         #expect(AccentTheme(rawValue: "chartreuse") == nil)
     }
 
-    @Test func hasEightCasesWithBlueDefault() {
-        #expect(AccentTheme.allCases.count == 8)
-        #expect(AccentTheme.default == .blue)
+    @Test func hasNineCasesWithGraphiteDefault() {
+        #expect(AccentTheme.allCases.count == 9)
+        #expect(AccentTheme.default == .graphite)
         #expect(AccentTheme.allCases.contains(.default))
     }
 
@@ -45,6 +46,7 @@ struct AccentThemeTests {
     }
 
     @Test func colorMapsToExpectedSystemColor() {
+        #expect(rgb(AccentTheme.graphite.color) == rgb(Color.primary))
         #expect(rgb(AccentTheme.blue.color) == rgb(Color.blue))
         #expect(rgb(AccentTheme.red.color) == rgb(Color.red))
         #expect(rgb(AccentTheme.teal.color) == rgb(Color.teal))

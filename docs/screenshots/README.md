@@ -16,6 +16,7 @@ with a subtle frame.
 2. Launch the app, seed the DEBUG sample data (the ladybug button on the
    Subscriptions tab), and capture each screen at native resolution
    (1206×2622): Home, the Subscriptions list, and a subscription detail.
-3. Frame each capture on a `#FAFAFB` background with rounded corners, a hairline
-   edge, and a soft shadow via ImageMagick, then overwrite the file of the same
-   name here. Keeping the filenames stable means the README needs no edits.
+3. Composite each capture into an iPhone 17 Pro device frame — thin uniform
+   bezel, Dynamic Island, titanium edge, and a soft shadow on a transparent
+   background — via ImageMagick, then overwrite the file of the same name here.
+   Keeping the filenames stable means the README needs no edits.

@@ -7,7 +7,9 @@
 ![iOS 26.5+](https://img.shields.io/badge/iOS-26.5%2B-111111)
 ![Swift 5](https://img.shields.io/badge/Swift-5-FA7343)
 
-![Cadence Home forecast placeholder](docs/screenshots/home.png)
+<p align="center">
+  <img src="docs/screenshots/home.png" width="300" alt="Cadence Home tab showing the month-end balance forecast and renewal calendar">
+</p>
 
 Cadence helps keep subscription renewals, run-rate totals, and the current month-end outlook in one place. The app is focused today on subscriptions and forecasting, with local-first persistence on device.
 
@@ -25,9 +27,11 @@ Cadence helps keep subscription renewals, run-rate totals, and the current month
 
 ## Screenshots
 
-| Subscriptions | Details |
-| --- | --- |
-| ![Cadence Subscriptions placeholder](docs/screenshots/subscriptions.png) | ![Cadence Details placeholder](docs/screenshots/detail.png) |
+<p align="center">
+  <img src="docs/screenshots/subscriptions.png" width="300" alt="Subscriptions list with the category filter row">
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/detail.png" width="300" alt="Subscription detail showing linked add-ons">
+</p>
 
 ## Architecture & Engineering
 

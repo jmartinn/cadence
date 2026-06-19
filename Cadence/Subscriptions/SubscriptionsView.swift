@@ -170,14 +170,13 @@ struct SubscriptionsView: View {
         } label: {
             Image(systemName: "plus")
                 .font(.system(size: 24, weight: .semibold))
-                // Invert against the monochrome circle (same pattern as the sort pills) so the
-                // glyph stays visible in dark mode, where Color.primary becomes white.
-                .foregroundColor(Color(.systemBackground))
+                // Monochrome glyph on clear glass; Color.primary adapts (near-black light /
+                // near-white dark). No fill or shadow — the glass supplies the elevation.
+                .foregroundStyle(Color.primary)
                 .frame(width: 58, height: 58)
-                .background(Color.primary)
-                .clipShape(Circle())
-                .shadow(color: .black.opacity(0.3), radius: 8, y: 4)
+                .glassEffect(.regular.interactive(), in: .circle)
         }
+        .buttonStyle(.plain) // suppress the default gray-dim; interactive glass owns the press feel
         .padding(.bottom, Space.xl)
         .accessibilityLabel("Add subscription")
     }

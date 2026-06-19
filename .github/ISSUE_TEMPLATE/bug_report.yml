@@ -1,0 +1,69 @@
+name: Bug report
+description: Report something that is not working in Cadence.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Please include enough detail to reproduce it.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What went wrong?
+      placeholder: A short description of the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the exact steps that trigger the issue.
+      placeholder: |
+        1. Open Cadence
+        2. Go to the affected screen
+        3. Tap the relevant control
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should have happened?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happened instead?
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device
+      placeholder: iPhone model or iPad model
+    validations:
+      required: true
+  - type: input
+    id: ios-version
+    attributes:
+      label: iOS version
+      placeholder: "26.5"
+    validations:
+      required: true
+  - type: input
+    id: build
+    attributes:
+      label: App or build context
+      placeholder: Branch, commit, TestFlight build, or local build context
+    validations:
+      required: true
+  - type: textarea
+    id: extra-context
+    attributes:
+      label: Screenshots or extra context
+      description: Add screenshots, recordings, or any additional context that helps explain the issue.
+    validations:
+      required: false

@@ -1,0 +1,47 @@
+name: Feature request
+description: Suggest an improvement for Cadence.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement. Please frame it around the user problem first.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user problem or workflow gap should this solve?
+      placeholder: Describe the situation where Cadence falls short today.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What should Cadence do?
+      placeholder: Describe the behavior, screen, or workflow you have in mind.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches did you consider?
+      placeholder: Note any simpler, manual, or different product approaches.
+    validations:
+      required: true
+  - type: textarea
+    id: value
+    attributes:
+      label: Expected value
+      description: How would this improve the app?
+      placeholder: Explain who benefits and how often this would matter.
+    validations:
+      required: true
+  - type: textarea
+    id: extra-context
+    attributes:
+      label: Extra context
+      description: Add sketches, screenshots, examples, or related notes.
+    validations:
+      required: false

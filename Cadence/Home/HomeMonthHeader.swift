@@ -2,12 +2,13 @@ import SwiftUI
 
 /// Top bar: centered month label flanked by nav chevrons, with a trailing profile button.
 /// Forward-only navigation: the left chevron is disabled at the current-month floor.
-/// Profile button is INERT this slice (Settings = deferred).
+/// The trailing profile button opens Settings via `onProfile`.
 struct HomeMonthHeader: View {
     let month: Date
     var canGoBack: Bool
     var onPrevious: () -> Void
     var onNext: () -> Void
+    var onProfile: () -> Void
 
     private static let formatter: DateFormatter = {
         let f = DateFormatter(); f.setLocalizedDateFormatFromTemplate("MMMMyyyy"); return f
@@ -40,12 +41,15 @@ struct HomeMonthHeader: View {
 
             HStack {
                 Spacer()
-                Image(systemName: "person")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.primary)
-                    .frame(width: 38, height: 38)
-                    .background(Circle().fill(Color(.secondarySystemFill)))
-                    .accessibilityHidden(true)         // inert placeholder for the Settings slice
+                Button(action: onProfile) {
+                    Image(systemName: "person")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.primary)
+                        .frame(width: 38, height: 38)
+                        .background(Circle().fill(Color(.secondarySystemFill)))
+                        .contentShape(Circle())
+                }
+                .accessibilityLabel("Settings")
             }
         }
     }
@@ -56,6 +60,7 @@ struct HomeMonthHeader: View {
         month: Date(timeIntervalSince1970: 1_764_547_200),
         canGoBack: true,
         onPrevious: {},
-        onNext: {}
+        onNext: {},
+        onProfile: {}
     ).padding()
 }

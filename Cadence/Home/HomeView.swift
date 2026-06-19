@@ -70,7 +70,8 @@ struct HomeView: View {
                         onNext: {
                             displayedMonth = MonthNavigation.advanced(from: displayedMonth, by: 1,
                                                                       today: today, calendar: calendar)
-                        }
+                        },
+                        onProfile: { path.append(SettingsRoute.settings) }
                     )
                     SpendingHeadline(monthlyTotal: summary.monthlyTotal)
                     if isViewingCurrentMonth {
@@ -108,6 +109,7 @@ struct HomeView: View {
             }
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .navigationDestination(for: Subscription.self) { SubscriptionDetailView(subscription: $0) }
+            .navigationDestination(for: SettingsRoute.self) { _ in SettingsView() }
             .sheet(isPresented: $showingAnchorSheet) { AnchorEditSheet(anchor: anchor) }
             .sheet(isPresented: $showingAdd) { SubscriptionFormView(mode: .add) }
             .confirmationDialog(disambiguationTitle, isPresented: isDisambiguating,

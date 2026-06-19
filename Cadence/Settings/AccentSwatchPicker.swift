@@ -1,9 +1,9 @@
 import SwiftUI
 
 /// Horizontal, scrollable row of accent swatches. Binds to the persisted accent
-/// (`@AppStorage("accentTheme")`); selecting one re-tints the whole app live via the root tint.
+/// (`@AppStorage(AccentTheme.storageKey)`); selecting one re-tints the whole app live via the root tint.
 struct AccentSwatchPicker: View {
-    @AppStorage("accentTheme") private var selection: AccentTheme = .default
+    @AppStorage(AccentTheme.storageKey) private var selection: AccentTheme = .default
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {

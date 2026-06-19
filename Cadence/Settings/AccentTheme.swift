@@ -38,3 +38,9 @@ enum AccentTheme: String, CaseIterable, Identifiable {
         }
     }
 }
+
+extension AccentTheme {
+    /// The `@AppStorage`/UserDefaults key under which the chosen accent is persisted.
+    /// Single source of truth for the key — referenced by both the root tint and the picker.
+    static let storageKey = "accentTheme"
+}

@@ -5,7 +5,7 @@ import SwiftUI
 /// (milestone 2) is a placeholder. A shared `TabRouter` lets Home's "See all" switch tabs.
 struct RootTabView: View {
     @State private var router = TabRouter()
-    @AppStorage("accentTheme") private var accent: AccentTheme = .default
+    @AppStorage(AccentTheme.storageKey) private var accent: AccentTheme = .default
 
     var body: some View {
         @Bindable var router = router

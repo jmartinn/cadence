@@ -11,6 +11,7 @@ struct SubscriptionsView: View {
     @State private var sort: SubscriptionSort = .nextCharge
     @State private var categoryFilter: SubscriptionCategory? = nil
     @State private var showingAdd = false
+    @AppStorage(AccentTheme.storageKey) private var accent: AccentTheme = .default
 
     private var today: Date { .now }
     private var calendar: Calendar { .current }
@@ -170,13 +171,11 @@ struct SubscriptionsView: View {
         } label: {
             Image(systemName: "plus")
                 .font(.system(size: 24, weight: .semibold))
-                // Monochrome glyph on clear glass; Color.primary adapts (near-black light /
-                // near-white dark). No fill or shadow — the glass supplies the elevation.
                 .foregroundStyle(Color.primary)
                 .frame(width: 58, height: 58)
-                .glassEffect(.regular.interactive(), in: .circle)
+                .glassEffect(.regular.tint(accent.color.opacity(0.10)).interactive(), in: .circle)
         }
-        .buttonStyle(.plain) // suppress the default gray-dim; interactive glass owns the press feel
+        .buttonStyle(.plain)
         .padding(.bottom, Space.xl)
         .accessibilityLabel("Add subscription")
     }

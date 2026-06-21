@@ -1,4 +1,3 @@
-// Cadence/Reminders/ReminderCoordinator.swift
 import CadenceKit
 import Foundation
 import SwiftData

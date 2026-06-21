@@ -34,7 +34,10 @@ struct ReminderCoordinator {
 
         let subscriptions = (try? context.fetch(FetchDescriptor<Subscription>())) ?? []
         let targets = subscriptions.map {
-            ReminderTarget(id: $0.serviceKey ?? $0.name, name: $0.name, plan: $0.plan)
+            // Key the notification id off the stable per-row identity, NOT serviceKey/name:
+            // serviceKey is non-unique (and shared by add-ons) and name is free-text, so either
+            // could collide and make UNUserNotificationCenter.add silently drop a reminder.
+            ReminderTarget(id: String(describing: $0.persistentModelID), name: $0.name, plan: $0.plan)
         }
 
         guard let end = calendar.date(byAdding: .month, value: Self.horizonMonths, to: now) else {

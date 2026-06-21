@@ -1,4 +1,3 @@
-// Cadence/Reminders/ReminderScheduler.swift
 import CadenceKit
 import Foundation
 import UserNotifications

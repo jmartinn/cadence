@@ -6,6 +6,8 @@ import SwiftUI
 struct RootTabView: View {
     @State private var router = TabRouter()
     @AppStorage(AccentTheme.storageKey) private var accent: AccentTheme = .default
+    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.modelContext) private var modelContext
 
     var body: some View {
         @Bindable var router = router
@@ -24,6 +26,11 @@ struct RootTabView: View {
         }
         .environment(router)
         .tint(accent.color)
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                Task { @MainActor in await ReminderCoordinator().reschedule(context: modelContext) }
+            }
+        }
     }
 }
 

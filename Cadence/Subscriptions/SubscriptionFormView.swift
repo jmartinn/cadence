@@ -142,6 +142,7 @@ struct SubscriptionFormView: View {
             draft.apply(to: sub, parent: parent)
         }
         persist()
+        WidgetRefresher.refresh(context: modelContext)
         Task { @MainActor in await ReminderCoordinator().reschedule(context: modelContext) }
         dismiss()
     }
@@ -153,6 +154,7 @@ struct SubscriptionFormView: View {
         }
         modelContext.delete(sub)
         persist()
+        WidgetRefresher.refresh(context: modelContext)
         Task { @MainActor in await ReminderCoordinator().reschedule(context: modelContext) }
         dismiss()
         onDelete?()

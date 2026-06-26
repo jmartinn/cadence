@@ -97,6 +97,7 @@ struct SubscriptionsView: View {
                             Button("Delete", systemImage: "trash", role: .destructive) {
                                 modelContext.delete(sub)
                                 persist()
+                                WidgetRefresher.refresh(context: modelContext)
                                 Task { @MainActor in await ReminderCoordinator().reschedule(context: modelContext) }
                             }
                         }

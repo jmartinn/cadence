@@ -2,6 +2,7 @@ import CadenceKit
 import SwiftData
 import SwiftUI
 import UIKit
+import UniformTypeIdentifiers
 
 /// Navigation token for pushing Settings onto the Home navigation stack.
 enum SettingsRoute: Hashable { case settings }
@@ -15,6 +16,8 @@ struct SettingsView: View {
     @State private var permissionDenied = false
     @State private var exportFile: ExportFile?
     @State private var dataError: String?
+    @State private var importing = false
+    @State private var pendingImport: PendingImport?
 
     private let coordinator = ReminderCoordinator()
 
@@ -52,6 +55,7 @@ struct SettingsView: View {
 
             Section {
                 Button("Export Backup") { exportBackup() }
+                Button("Import Backup…") { importing = true }
             } header: {
                 Text("Data")
             } footer: {
@@ -78,6 +82,23 @@ struct SettingsView: View {
         }
         .sheet(item: $exportFile) { file in
             ShareSheet(items: [file.url])
+        }
+        .fileImporter(isPresented: $importing, allowedContentTypes: [.json]) { result in
+            switch result {
+            case let .success(url): loadForConfirmation(url)
+            case .failure: dataError = "Couldn't read that file."
+            }
+        }
+        .alert("Replace all data?", isPresented: Binding(
+            get: { pendingImport != nil },
+            set: { if !$0 { pendingImport = nil } }
+        ), presenting: pendingImport) { pending in
+            Button("Replace", role: .destructive) { performImport(pending.document) }
+            Button("Cancel", role: .cancel) { pendingImport = nil }
+        } message: { pending in
+            Text("This removes your current \(pending.currentSubscriptionCount) "
+                + "subscriptions and balance, and loads \(pending.document.subscriptions.count) "
+                + "from this backup. This can't be undone.")
         }
         .alert("Backup failed", isPresented: Binding(
             get: { dataError != nil },
@@ -109,6 +130,32 @@ struct SettingsView: View {
         }
     }
 
+    /// Read + decode the picked file, then stage a confirmation. Decoding failures become alerts.
+    private func loadForConfirmation(_ url: URL) {
+        let scoped = url.startAccessingSecurityScopedResource()
+        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+        do {
+            let document = try BackupCodec.decode(try Data(contentsOf: url))
+            let count = (try? modelContext.fetch(FetchDescriptor<Subscription>()).count) ?? 0
+            pendingImport = PendingImport(document: document, currentSubscriptionCount: count)
+        } catch BackupError.unsupportedVersion {
+            dataError = "This backup was made by a newer version of Cadence. Update the app to import it."
+        } catch {
+            dataError = "This file isn't a valid Cadence backup."
+        }
+    }
+
+    /// Apply the confirmed restore, then reschedule reminders for the new subscription set.
+    private func performImport(_ document: BackupDocument) {
+        do {
+            try BackupService.restore(document, into: modelContext)
+            Task { await coordinator.reschedule(context: modelContext) }
+        } catch {
+            dataError = "Couldn't restore that backup."
+        }
+        pendingImport = nil
+    }
+
     /// On enable: request authorization just-in-time. On disable: cancel everything.
     private func handleToggle(_ enabled: Bool) async {
         if enabled {
@@ -128,6 +175,14 @@ struct SettingsView: View {
 private struct ExportFile: Identifiable {
     let id = UUID()
     let url: URL
+}
+
+/// A decoded backup awaiting the user's confirm/cancel, plus the current count so the
+/// confirmation can spell out exactly what the replace will remove.
+private struct PendingImport: Identifiable {
+    let id = UUID()
+    let document: BackupDocument
+    let currentSubscriptionCount: Int
 }
 
 #if DEBUG

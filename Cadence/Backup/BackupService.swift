@@ -41,4 +41,41 @@ enum BackupService {
         return BackupDocument(exportedAt: exportedAt, appVersion: appVersion,
                               subscriptions: dtos, anchor: anchor)
     }
+
+    /// Replace ALL data with the document's contents. Destructive — callers must confirm first.
+    /// Deletes every subscription + the anchor, then re-creates rows in two passes (create all,
+    /// then wire `parent` from `parentID`) so add-on links survive, and restores the anchor.
+    static func restore(_ document: BackupDocument, into context: ModelContext) throws {
+        for sub in try context.fetch(FetchDescriptor<Subscription>()) {
+            context.delete(sub)
+        }
+        if let anchor = try context.currentAnchor() {
+            context.delete(anchor)
+        }
+
+        var byFileID: [UUID: Subscription] = [:]
+        for dto in document.subscriptions {
+            let sub = Subscription(
+                name: dto.name, amount: dto.amount, billingCycle: dto.billingCycle,
+                anchorDate: dto.anchorDate, status: dto.status, category: dto.category,
+                serviceKey: dto.serviceKey, paymentBrand: dto.paymentBrand,
+                paymentLast4: dto.paymentLast4
+            )
+            context.insert(sub)
+            byFileID[dto.id] = sub
+        }
+        for dto in document.subscriptions {
+            guard let parentID = dto.parentID,
+                  let child = byFileID[dto.id],
+                  let parent = byFileID[parentID] else { continue }
+            child.parent = parent
+        }
+
+        if let anchor = document.anchor {
+            try context.setAnchor(balance: anchor.balance, asOfDate: anchor.asOfDate,
+                                  monthlyIncome: anchor.monthlyIncome, incomePayday: anchor.incomePayday)
+        }
+
+        try context.save()
+    }
 }

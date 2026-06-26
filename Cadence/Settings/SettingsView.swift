@@ -149,6 +149,7 @@ struct SettingsView: View {
     private func performImport(_ document: BackupDocument) {
         do {
             try BackupService.restore(document, into: modelContext)
+            WidgetRefresher.refresh(context: modelContext)
             Task { await coordinator.reschedule(context: modelContext) }
         } catch {
             // Drop the half-applied delete/insert so the in-memory store matches disk.

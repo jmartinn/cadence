@@ -28,6 +28,7 @@ struct RootTabView: View {
         .tint(accent.color)
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
+                WidgetRefresher.refresh(context: modelContext)
                 Task { @MainActor in await ReminderCoordinator().reschedule(context: modelContext) }
             }
         }

@@ -13,6 +13,8 @@ struct SettingsView: View {
     @AppStorage(ReminderDefaults.enabledKey) private var remindersEnabled = false
     @AppStorage(ReminderDefaults.leadTimeKey) private var leadTime: ReminderLeadTime = .oneDay
     @State private var permissionDenied = false
+    @State private var exportFile: ExportFile?
+    @State private var dataError: String?
 
     private let coordinator = ReminderCoordinator()
 
@@ -48,6 +50,14 @@ struct SettingsView: View {
                 AccentSwatchPicker()
             }
 
+            Section {
+                Button("Export Backup") { exportBackup() }
+            } header: {
+                Text("Data")
+            } footer: {
+                Text("Save a copy of your subscriptions and balance to share or store.")
+            }
+
             Section("About") {
                 HStack {
                     Text("Version")
@@ -66,12 +76,37 @@ struct SettingsView: View {
         .onChange(of: leadTime) { _, _ in
             Task { await coordinator.reschedule(context: modelContext) }
         }
+        .sheet(item: $exportFile) { file in
+            ShareSheet(items: [file.url])
+        }
+        .alert("Backup failed", isPresented: Binding(
+            get: { dataError != nil },
+            set: { if !$0 { dataError = nil } }
+        )) {
+            Button("OK", role: .cancel) { dataError = nil }
+        } message: {
+            Text(dataError ?? "")
+        }
     }
 
     /// Reflect the real system permission state in the denied banner.
     private func refreshPermissionState() async {
         let status = await coordinator.scheduler.authorizationStatus()
         permissionDenied = remindersEnabled && status == .denied
+    }
+
+    /// Build the backup file and present the system share sheet for it.
+    private func exportBackup() {
+        do {
+            let document = try BackupService.export(from: modelContext)
+            let data = try BackupCodec.encode(document)
+            let url = FileManager.default.temporaryDirectory
+                .appendingPathComponent(BackupService.suggestedFilename())
+            try data.write(to: url, options: .atomic)
+            exportFile = ExportFile(url: url)
+        } catch {
+            dataError = "Couldn't create the backup."
+        }
     }
 
     /// On enable: request authorization just-in-time. On disable: cancel everything.
@@ -87,6 +122,12 @@ struct SettingsView: View {
         }
         await coordinator.reschedule(context: modelContext)
     }
+}
+
+/// Wraps the temp export URL so `.sheet(item:)` can present the share sheet for it.
+private struct ExportFile: Identifiable {
+    let id = UUID()
+    let url: URL
 }
 
 #if DEBUG

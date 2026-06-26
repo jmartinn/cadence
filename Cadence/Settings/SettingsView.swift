@@ -151,6 +151,8 @@ struct SettingsView: View {
             try BackupService.restore(document, into: modelContext)
             Task { await coordinator.reschedule(context: modelContext) }
         } catch {
+            // Drop the half-applied delete/insert so the in-memory store matches disk.
+            modelContext.rollback()
             dataError = "Couldn't restore that backup."
         }
         pendingImport = nil

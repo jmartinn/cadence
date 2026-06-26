@@ -42,6 +42,17 @@ enum BackupService {
                               subscriptions: dtos, anchor: anchor)
     }
 
+    /// A stable, human-readable filename for an exported backup, e.g.
+    /// `Cadence-Backup-2026-06-26.json`. Fixed `en_US_POSIX` + UTC so the stamp never shifts
+    /// with the user's locale or timezone.
+    static func suggestedFilename(for date: Date = .now) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        formatter.dateFormat = "yyyy-MM-dd"
+        return "Cadence-Backup-\(formatter.string(from: date)).json"
+    }
+
     /// Replace ALL data with the document's contents. Destructive — callers must confirm first.
     /// Deletes every subscription + the anchor, then re-creates rows in two passes (create all,
     /// then wire `parent` from `parentID`) so add-on links survive, and restores the anchor.

@@ -11,8 +11,8 @@ struct NextChargesEntry: TimelineEntry {
 /// Reads the App Group snapshot, computes upcoming charges, and emits a short daily countdown
 /// timeline that re-requests once the soonest charge has passed (or after a week for distant ones).
 struct NextChargesProvider: TimelineProvider {
-    /// Enough for the medium list plus a little headroom.
-    private static let limit = 4
+    /// The medium family renders the next 3 charges; small renders the first.
+    private static let limit = 3
     /// Daily countdown entries before WidgetKit asks for a fresh timeline.
     private static let countdownDays = 7
 
@@ -75,3 +75,17 @@ struct NextChargesWidget: Widget {
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }
+
+#if DEBUG
+#Preview(as: .systemSmall) {
+    NextChargesWidget()
+} timeline: {
+    NextChargesEntry(date: .now, charges: NextChargesProvider.sample)
+}
+
+#Preview(as: .systemMedium) {
+    NextChargesWidget()
+} timeline: {
+    NextChargesEntry(date: .now, charges: NextChargesProvider.sample)
+}
+#endif

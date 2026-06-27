@@ -70,6 +70,18 @@
 			);
 			target = 0A2860252FEF282D00544616 /* CadenceWidgetsExtension */;
 		};
+		0A81A9712FF0121D00A97741 /* Exceptions for "Cadence" folder in "CadenceWidgetsExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Components/Color+Hex.swift",
+				Components/PriceText.swift,
+				Components/ServiceCatalog.swift,
+				Components/ServiceIcon.swift,
+				ServiceIcons.xcassets,
+				Widget/AppGroup.swift,
+			);
+			target = 0A2860252FEF282D00544616 /* CadenceWidgetsExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -83,6 +95,9 @@
 		};
 		0A4D69332FDCA15D00BF85DD /* Cadence */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				0A81A9712FF0121D00A97741 /* Exceptions for "Cadence" folder in "CadenceWidgetsExtension" target */,
+			);
 			path = Cadence;
 			sourceTree = "<group>";
 		};

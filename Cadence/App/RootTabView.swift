@@ -32,6 +32,12 @@ struct RootTabView: View {
                 Task { @MainActor in await ReminderCoordinator().reschedule(context: modelContext) }
             }
         }
+        .onOpenURL { url in
+            // The next-charges widget deep-links here; land on Home (the upcoming dashboard).
+            if url.scheme == "cadence", url.host == "home" {
+                router.selection = TabRouter.home
+            }
+        }
     }
 }
 

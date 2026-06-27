@@ -45,7 +45,8 @@ struct MediumChargesView: View {
         } else {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Upcoming").font(.headline)
-                ForEach(Array(charges.enumerated()), id: \.offset) { _, charge in
+                // `date` is a stable, unique key — the planner emits one next-occurrence per subscription.
+                ForEach(charges, id: \.date) { charge in
                     HStack(spacing: 10) {
                         ServiceIcon(serviceKey: charge.serviceKey, name: charge.name, size: 28)
                         Text(charge.name).font(.subheadline).lineLimit(1)

@@ -101,10 +101,10 @@ struct ServiceCatalogTests {
     }
 
     @Test func uncoveredBrandsHaveNilIconAssetName() {
-        // apple-one is the sole catalog brand with no bundled logo — a service bundle with no App
-        // Store app icon to source, so it stays a brand-color letter tile. Everything else (including
-        // midjourney, now vendored from theSVG) resolves to a real icon.
-        let uncovered = ["apple-one"]
+        // apple-one (a service bundle with no App Store app icon) and the generic "domain" brand
+        // (deliberately brand-less, a neutral tile for any registrar) are the only catalog brands
+        // with no bundled logo. Everything else resolves to a real icon.
+        let uncovered = ["apple-one", "domain"]
         for slug in uncovered {
             let brand = ServiceCatalog.brand(serviceKey: slug, name: "")
             #expect(brand?.iconAssetName == nil, "\(slug) has no bundled icon")
@@ -123,6 +123,19 @@ struct ServiceCatalogTests {
         #expect(ServiceCatalog.brand(serviceKey: nil, name: "FlixOlé")?.slug == "flixole")
         #expect(ServiceCatalog.brand(serviceKey: nil, name: "Antena3")?.slug == "atresplayer")
         #expect(ServiceCatalog.brand(serviceKey: nil, name: "Lionsgate Play")?.slug == "lionsgate")
+    }
+
+    @Test func personalOneOffBrandsResolveByKeyAndAlias() {
+        // Domains & home: the registrar and the two personal apps resolve by key, alias, and prefix;
+        // the generic "domain" brand only ever resolves by explicit key or a "domain…" name.
+        for slug in ["squarespace", "domain", "fermax-duoxme", "colder-or-warmer"] {
+            #expect(ServiceCatalog.brand(serviceKey: slug, name: "") != nil, "\(slug) must resolve")
+        }
+        #expect(ServiceCatalog.brand(serviceKey: nil, name: "Squarespace Domains")?.slug == "squarespace")
+        #expect(ServiceCatalog.brand(serviceKey: nil, name: "Fermax DuoxMe — Dwelling 1")?.slug == "fermax-duoxme")
+        #expect(ServiceCatalog.brand(serviceKey: nil, name: "Colder or Warmer: Lazy Weather")?.slug == "colder-or-warmer")
+        #expect(ServiceCatalog.brand(serviceKey: nil, name: "Domain renewal")?.slug == "domain")
+        #expect(ServiceCatalog.brand(serviceKey: nil, name: "jmartinn.com domain") == nil)
     }
 
     @Test func resolvesExtendedNamesByLongestPrefix() {

@@ -131,6 +131,12 @@ enum ServiceCatalog {
         ServiceBrand(slug: "flixole", displayName: "FlixOlé", hex: "#D81E27", iconAssetName: "flixole", aliases: ["flixolé"]),
         ServiceBrand(slug: "atresplayer", displayName: "atresplayer", hex: "#FF6C0E", iconAssetName: "atresplayer", aliases: ["a3player", "antena3", "atresmedia"]),
         ServiceBrand(slug: "mitele", displayName: "Mitele", hex: "#0A47A9", iconAssetName: "mitele", aliases: ["miteleplus", "mediaset", "mediasetinfinity"]),
+
+        // Domains & home (personal one-offs)
+        ServiceBrand(slug: "squarespace", displayName: "Squarespace", hex: "#000000", iconAssetName: "squarespace", aliases: ["squarespacedomains", "googledomains"]),
+        ServiceBrand(slug: "domain", displayName: "Domain", hex: "#8E8E93", iconAssetName: nil, aliases: ["domains", "domainname", "domainrenewal"]),
+        ServiceBrand(slug: "fermax-duoxme", displayName: "Fermax DuoxMe", hex: "#3E4CA6", iconAssetName: "fermax-duoxme", aliases: ["duoxme", "fermax"]),
+        ServiceBrand(slug: "colder-or-warmer", displayName: "Colder or Warmer", hex: "#131313", iconAssetName: "colder-or-warmer", aliases: ["colderorwarmerlazyweather", "lazyweather"]),
     ]
 
     /// Lowercase and strip every non-alphanumeric character. "Disney+" → "disney",

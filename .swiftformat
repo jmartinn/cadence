@@ -13,6 +13,7 @@
 #   noForceTryInTests    — tests force-try fixtures by design
 #   redundantSendable    — keep explicit `: Sendable` (documented intent on value types)
 #   numberFormatting     — keep intentional digit grouping (e.g. 10_000)
+#   wrapIfStatementBodies — keeps single-line `if … { return x }` bodies (SwiftFormat ≥ 0.63)
 
 --swiftversion 5.0
 
@@ -36,5 +37,6 @@
 --disable noForceTryInTests
 --disable redundantSendable
 --disable numberFormatting
+--disable wrapIfStatementBodies
 
 --exclude .build,docs,scripts,.git,CadenceKit/.build
